@@ -1,0 +1,24 @@
+module game
+
+
+// Data types
+type Player {X(); O()}
+
+// Cell on the board (Empty or Occupied)
+type Cell {Empty(); Occupied(player: Player)}
+
+// Board 3x3
+type SmallBoard = List[List[Cell]]
+
+// Entire 9x9 board
+
+type BigBoard = List[List[SmallBoard]]
+
+record Position(row: Int, col: Int)
+
+record GameState(
+  board: BigBoard,
+  currentPlayer: Player,
+  activeBoard: Option[Position] // The small board that the current player must play in, None means any board is valid
+)
+
