@@ -1,6 +1,5 @@
 {
-  ## TODO: Change to your project's description:
-  description = "Nix template for Effekt projects";
+  description = "Project Ultimate Tic-Tac-Toe for the Effekt course";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
@@ -21,8 +20,7 @@
         effekt-lib = effekt-nix.lib.${system};
 
         ## Project configuration
-        # TODO: Change to your project's details:
-        pname = "effekt-template";         # package name
+        pname = "Ultimate-Tic-Tac-Toe";         # package name
         version = "0.1.0";                 # package version
         mainFile = "src/main.effekt";      # relative path to entrypoint (as a string)
         testFiles = [ "src/test.effekt" ]; # relative paths to tests (as a string)
