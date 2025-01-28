@@ -22,3 +22,8 @@ record GameState(
   activeBoard: Option[Position] // The small board that the current player must play in, None means any board is valid
 )
 
+// Effects
+effect GetPlayerMove(state: GameState): Position
+effect DisplayBoard(board: BigBoard): Unit
+effect AnnounceWinner(winner: Option[Player]): Unit
+effect Error(msg: String): Nothing
