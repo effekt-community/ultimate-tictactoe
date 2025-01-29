@@ -1,3 +1,5 @@
 module src/lib
 
+effect WrongInput(msg: String): Unit
+
 def helloWorld(): String = "Hello, world!"

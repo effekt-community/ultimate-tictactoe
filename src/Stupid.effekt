@@ -3,14 +3,17 @@ module src/Stupid
 import tty
 import io/console
 import stream
+import src/lib
 
 type Row = List[String]
 type SmallBoard = List[List[String]]
 type BigBoard = List[List[SmallBoard]]
 
+type Player = String
+
 val row1: Row = fill(3, "·")
 val row2: Row = fill(3, "·")
-val row3: Row = fill(3, "·")
+val row3: Row = fill(3, "⚬")
 
 val smallBoard: SmallBoard = [
   row1,
@@ -37,6 +40,18 @@ def renderRow(l: Row): Unit = {
     }
   }
   println(rowString)
+}
+
+def createNewBigBoard(): BigBoard = {
+  val row1: Row = fill(3, "⚬")
+  val smallBoard: SmallBoard = fill(3, row1)
+  val bigBoard: BigBoard = fill(3,fill(3, smallBoard))
+  bigBoard
+}
+
+def clearScreen(): Unit = {
+  println("\u001b[2J") // clear the screen
+  println("\u001b[H") // move the cursor to the top left corner
 }
 
 def renderBoard(board: BigBoard): Unit = {
@@ -67,7 +82,7 @@ def createUnifiedRow(boardRow: List[SmallBoard]): List[String] = {
     val smallBoard: SmallBoard = boardRow.get(counterSmallBoard)
     unifiedRow = unifiedRow.insert(unifiedRow.size(), smallBoard.get(counterRow)) // insert the row of the small board
     if (counterSmallBoard == 2) {
-      unifiedRow = unifiedRow.insert(unifiedRow.size(), ["\n"]) // new line
+      unifiedRow = unifiedRow.insert(unifiedRow.size(), ["\n"]) // new line symbol
       counterSmallBoard = 0
       counterRow = counterRow + 1
     } else {
@@ -82,6 +97,53 @@ def createUnifiedRow(boardRow: List[SmallBoard]): List[String] = {
 }
 
 
+def playGame(): Unit = {
+  println("Welcome to the ULTIMATE TIC-TAC-TOE!")
+  println("Press enter to start the game.")
+  var player: Player = ""
+  with console
+  do readLine()
+  var currentGameBoard: BigBoard = createNewBigBoard()
+  renderBoard(currentGameBoard)
+  var play = true
+  def chooseSide(): Unit / {WrongInput} = {
+
+    println("Choose the side[X, O]:")
+    val side = do readLine()
+    side match {
+      case "X" => player = "X"
+      case "O" => player = "O"
+      case _ =>
+        do WrongInput("Invalid input. Please type 'X' or 'O'!")
+        chooseSide()
+    }
+    ()
+  }
+
+  def gameLoop(): Unit / {WrongInput} = {
+    var currentGameBoard: BigBoard = createNewBigBoard()
+    while (play) {
+      clearScreen()
+      renderBoard(currentGameBoard)
+      do readLine()
+    ()
+  }
+    ()
+  }
+  def handleInput(): Bool/{WrongInput} = {
+    println("ULTIMATE TIC-TAC-TOE\n\nStart the game?\n\n(y = yes, q = quit):")
+    with console
+    val input = do readLine()
+      input match {
+        case "y" => true
+        case "q" => false
+        case _ =>
+          do WrongInput("Invalid input. Please type 'y' to play again or 'q' to quit.")
+          handleInput()
+      }
+  }
+  println("Goodbye!")
+}
 def main(): Unit = {
-  renderBoard(bigBoard)
+  playGame()
 }
