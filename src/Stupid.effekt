@@ -11,44 +11,6 @@ type BigBoard = List[List[SmallBoard]]
 
 type Player = String
 
-val row1: Row = fill(3, "·")
-val row2: Row = fill(3, "·")
-val row3: Row = fill(3, "⚬")
-
-val smallBoard: SmallBoard = [
-  row1,
-  row2,
-  row3
-  ]
-
-val bigBoard: BigBoard = [
-      [smallBoard, smallBoard, smallBoard],
-      [smallBoard, smallBoard, smallBoard],
-      [smallBoard, smallBoard, smallBoard]
-  ]
-
-def renderRow(l: Row): Unit = {
-  val rowString: String = l.foldLeft("") { (acc, elem) =>
-    if (acc == "") {
-      elem ++ " "
-    }else { 
-      if (elem == "\n") {
-        acc ++ elem
-      }else {
-        acc ++ elem ++ " " 
-      }
-    }
-  }
-  println(rowString)
-}
-
-def createNewBigBoard(): BigBoard = {
-  val row1: Row = fill(3, "⚬")
-  val smallBoard: SmallBoard = fill(3, row1)
-  val bigBoard: BigBoard = fill(3,fill(3, smallBoard))
-  bigBoard
-}
-
 def clearScreen(): Unit = {
   println("\u001b[2J") // clear the screen
   println("\u001b[H") // move the cursor to the top left corner
@@ -62,14 +24,6 @@ def renderBoard(board: BigBoard): Unit = {
     renderSeparator()
     ()
   }
-  ()
-}
-
-def renderSeparator(): Unit = {
-  var separator: List[String] = fill(11, "—")
-  separator = separator.replace(3, "+")
-  separator = separator.replace(7, "+")
-  renderRow(separator)
   ()
 }
 
@@ -96,53 +50,111 @@ def createUnifiedRow(boardRow: List[SmallBoard]): List[String] = {
   resultRow
 }
 
+def renderRow(l: Row): Unit = {
+  val rowString: String = l.foldLeft("") { (acc, elem) =>
+    if (acc == "") {
+      elem ++ " "
+    }else { 
+      if (elem == "\n") {
+        acc ++ elem
+      }else {
+        acc ++ elem ++ " " 
+      }
+    }
+  }
+  println(rowString)
+}
+
+def renderSeparator(): Unit = {
+  var separator: List[String] = fill(11, "—")
+  separator = separator.replace(3, "+")
+  separator = separator.replace(7, "+")
+  renderRow(separator)
+  ()
+}
+
+def generateNewBigBoard(): BigBoard = {
+  val row1: Row = fill(3, "⚬")
+  val smallBoard: SmallBoard = fill(3, row1)
+  val bigBoard: BigBoard = fill(3,fill(3, smallBoard))
+  bigBoard
+}
 
 def playGame(): Unit = {
-  println("Welcome to the ULTIMATE TIC-TAC-TOE!")
-  println("Press enter to start the game.")
-  var player: Player = ""
   with console
-  do readLine()
-  var currentGameBoard: BigBoard = createNewBigBoard()
-  renderBoard(currentGameBoard)
-  var play = true
-  def chooseSide(): Unit / {WrongInput} = {
 
+  def chooseSide(): Player / {WrongInput} = {
     println("Choose the side[X, O]:")
     val side = do readLine()
     side match {
-      case "X" => player = "X"
-      case "O" => player = "O"
+      case "X" => "X"
+      case "O" => "O"
       case _ =>
-        do WrongInput("Invalid input. Please type 'X' or 'O'!")
+        do WrongInput("Invalid player type. Please type 'X' or 'O'!")
         chooseSide()
     }
-    ()
+  }
+
+  def chooseSmallBoard(): Int / {WrongInput} = {
+    println("Choose the Small Board[1 - 9]:")
+    val sBNumber: String = do readLine()
+    if (not(any(Numbers) {elem => elem == sBNumber})) {
+      do WrongInput("Invalid input. Please type a number from 1 to 9.")
+      chooseSmallBoard()
+    }else {
+      with on[WrongFormat].panic
+      val num: Int = toInt(sBNumber)
+      num
+    }
   }
 
   def gameLoop(): Unit / {WrongInput} = {
-    var currentGameBoard: BigBoard = createNewBigBoard()
-    while (play) {
-      clearScreen()
-      renderBoard(currentGameBoard)
-      do readLine()
+    var endGame: Bool = false
+    var currentGameBoard: BigBoard = generateNewBigBoard()
+    clearScreen()
+    renderBoard(currentGameBoard)
+    while (not(endGame)){
+      var sB: Int = chooseSmallBoard()
+      println("Your Small Board is " ++ sB.show)
+      ()
+    }
+  }
+
+  // MAIN SECTION
+
+  clearScreen()
+
+  println("Welcome to the ULTIMATE TIC-TAC-TOE!")
+  println("Press enter to start the game.")
+  do readLine()
+  var play: Bool = true
+  
+  var currentGameBoard: BigBoard = generateNewBigBoard()
+
+  var player: Player = ""
+  while (play) {
+
+
+    try{
+
+      // Choosing a player side
+      player = chooseSide()
+      
+      // Starting the game
+      gameLoop()
+
+
+
+    } with WrongInput { msg =>
+      println(msg)
+      println("\n")
+      resume(())
+    }
     ()
   }
-    ()
-  }
-  def handleInput(): Bool/{WrongInput} = {
-    println("ULTIMATE TIC-TAC-TOE\n\nStart the game?\n\n(y = yes, q = quit):")
-    with console
-    val input = do readLine()
-      input match {
-        case "y" => true
-        case "q" => false
-        case _ =>
-          do WrongInput("Invalid input. Please type 'y' to play again or 'q' to quit.")
-          handleInput()
-      }
-  }
-  println("Goodbye!")
+  
+
+  println("Goodbye: " ++ player)
 }
 def main(): Unit = {
   playGame()
