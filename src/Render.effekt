@@ -59,7 +59,7 @@ def createUnifiedRow(boardRow: List[SmallBoard]): List[Cell] = {
 
   while (counterRow < 3) {
     with on[OutOfBounds].panic // disable all the error messages
-    var smallBoard: SmallBoard = boardRow.get(counterSmallBoard) // Taking the small board
+    var smallBoard: SmallBoard = boardsRow.get(counterSmallBoard) // Taking the small board
     unifiedRow = unifiedRow.insert(unifiedRow.size(), smallBoard.take(3)) // insert the row of the small board
     smallBoard = smallBoard.drop(3) // remove the row from the small board
     boardsRow = boardsRow.replace(counterSmallBoard, smallBoard) // replace the small board with the new one

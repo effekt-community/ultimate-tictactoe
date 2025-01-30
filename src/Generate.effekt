@@ -34,12 +34,37 @@ def newActiveSmallBoard(bigBoards: BigBoards, number: Int): BigBoards = {
   BigBoards(newBigBoard, bigBoards.smallCopy)
 }
 
+def deactivateSmallBoard(bigBoards: BigBoards, number: Int): BigBoards = {
+  with on[OutOfBounds].panic
+
+  var newBigBoard: BigBoard = bigBoards.bigBoard
+  var newSmallBoard: SmallBoard = newBigBoard.get(number - 1)
+  var counter: Int = 0
+  newSmallBoard.foreach {cell =>
+    cell match {
+      case Active() => newSmallBoard = newSmallBoard.replace(counter, Empty())
+      case _ => ()
+    }
+    counter = counter + 1
+    ()
+  }
+  newBigBoard = newBigBoard.replace(number - 1, newSmallBoard)
+  BigBoards(newBigBoard, bigBoards.smallCopy)
+}
+
 def checkNewCell(bigBoards: BigBoards, smallBoardNumber: Int, cellNumber: Int, player: Player): BigBoards = {
   with on[OutOfBounds].panic
 
   var newBigBoard: BigBoard = bigBoards.bigBoard
   var newSmallBoard: SmallBoard = newBigBoard.get(smallBoardNumber - 1)
-  newSmallBoard = newSmallBoard.replace(cellNumber, Filled(player))
+  newSmallBoard = newSmallBoard.replace(cellNumber - 1, Filled(player))
   newBigBoard = newBigBoard.replace(smallBoardNumber - 1, newSmallBoard)
   BigBoards(newBigBoard, bigBoards.smallCopy)
+}
+
+def checkAvailableSmallBoard(bigBoards: BigBoards, cellNumber: Int): Bool = {
+  with on[OutOfBounds].panic
+  val cellType: Cell = bigBoards.smallCopy.get(cellNumber - 1)
+  if (cellType is Empty()) true
+  else false
 }

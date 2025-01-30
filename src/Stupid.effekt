@@ -53,9 +53,10 @@ def playGame(): Unit = {
     var currentGameBoard: BigBoards = generateNewBigBoard()
     var currentSmallBoard: Int = 10
     var currentCell: Int = 10
+    var currentPlayer: Player = player
     printGameScreen(currentGameBoard, player)
 
-    if (player is Cross()) {
+    if (currentPlayer is Cross()) {
       println("You're starting the game!\nChoose the starting Small Board.")
       currentSmallBoard = chooseSmallBoard(currentGameBoard)
       currentGameBoard = newActiveSmallBoard(currentGameBoard, currentSmallBoard)
@@ -68,11 +69,25 @@ def playGame(): Unit = {
       if (currentSmallBoard == 10) {
         currentSmallBoard = chooseSmallBoard(currentGameBoard)
         currentGameBoard = newActiveSmallBoard(currentGameBoard, currentSmallBoard)
-        printGameScreen(currentGameBoard, player)
       }
+      printGameScreen(currentGameBoard, currentPlayer)
       currentCell = chooseCell(currentGameBoard)
-      currentGameBoard = checkNewCell(currentGameBoard, currentSmallBoard, currentCell, player)
-      
+      currentGameBoard = checkNewCell(currentGameBoard, currentSmallBoard, currentCell, currentPlayer)
+
+      printGameScreen(currentGameBoard, currentPlayer)
+      println("Excellent Move! Now Press the Enter to finish your turn.")
+      do readLine()
+
+      if(currentPlayer is Cross()) currentPlayer = Nought()
+      else currentPlayer = Cross()
+      if (checkAvailableSmallBoard(currentGameBoard, currentCell)){
+        currentGameBoard = deactivateSmallBoard(currentGameBoard, currentSmallBoard)
+        currentSmallBoard = currentCell
+        currentGameBoard = newActiveSmallBoard(currentGameBoard, currentSmallBoard)
+        currentCell = 10
+      } else {
+        currentGameBoard = deactivateSmallBoard(currentGameBoard, currentCell)
+      }
       ()
     }
   }
