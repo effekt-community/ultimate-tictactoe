@@ -7,12 +7,18 @@ import stream
 
 def renderBoard(board: BigBoard): Unit = {
   with Formatted::formatting
+  var counter = 0
   renderSeparator()
-  board.foreach {elem =>  // elem is a List[SmallBoard] -> List[List[List[Cell]]]
-    val bigRow: List[Cell] = createUnifiedRow(elem)
+  while (counter < 3) {
+    with on[OutOfBounds].panic
+    var smallBoards: List[SmallBoard] = empty()
+    smallBoards = smallBoards.insert(smallBoards.size(), board.get(counter * 3))
+    smallBoards = smallBoards.insert(smallBoards.size(), board.get(counter * 3 + 1))
+    smallBoards = smallBoards.insert(smallBoards.size(), board.get(counter * 3 + 2))
+    counter = counter + 1
+    val bigRow: List[Cell] = createUnifiedRow(smallBoards)
     renderRow(bigRow)
     renderSeparator()
-    ()
   }
   ()
 }
@@ -44,18 +50,19 @@ def renderSeparator(): Unit = {
 }
 
 def createUnifiedRow(boardRow: List[SmallBoard]): List[Cell] = {
-  with on[OutOfBounds].panic // disable all the error messages
+  var boardsRow: List[SmallBoard] = boardRow
 
-  var unifiedRow: List[List[Cell]] = []
+  var unifiedRow: List[List[Cell]] = empty()
 
   var counterSmallBoard: Int = 0
   var counterRow: Int = 0
 
   while (counterRow < 3) {
-    val smallBoard: SmallBoard = boardRow.get(counterSmallBoard)
-
-    unifiedRow = unifiedRow.insert(unifiedRow.size(), smallBoard.get(counterRow)) // insert the row of the small board
-
+    with on[OutOfBounds].panic // disable all the error messages
+    var smallBoard: SmallBoard = boardRow.get(counterSmallBoard) // Taking the small board
+    unifiedRow = unifiedRow.insert(unifiedRow.size(), smallBoard.take(3)) // insert the row of the small board
+    smallBoard = smallBoard.drop(3) // remove the row from the small board
+    boardsRow = boardsRow.replace(counterSmallBoard, smallBoard) // replace the small board with the new one
     if (counterSmallBoard == 2) {
       unifiedRow = unifiedRow.insert(unifiedRow.size(), [NewLine()]) // new line symbol
       counterSmallBoard = 0
@@ -69,4 +76,13 @@ def createUnifiedRow(boardRow: List[SmallBoard]): List[Cell] = {
   var resultRow: List[Cell] = unifiedRow.join()
   resultRow = resultRow.deleteAt(resultRow.size() - 1) // remove the last new line
   resultRow
+}
+
+def printGameScreen(bigBoards: BigBoards, player: Player): Unit = {
+  clearScreen()
+  println("You're playing as " ++ playerString(player))
+  newLine()
+  
+  renderBoard(bigBoards.bigBoard)
+  newLine()
 }

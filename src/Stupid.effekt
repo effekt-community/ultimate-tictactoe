@@ -12,39 +12,67 @@ import src/Generate
 def playGame(): Unit = {
   with console
 
-  // def chooseSide(): Player / {WrongInput} = {
-  //   println("Choose the side[X, O]:")
-  //   val side = do readLine()
-  //   side match {
-  //     case "X" => "X"
-  //     case "O" => "O"
-  //     case _ =>
-  //       do WrongInput("Invalid player type. Please type 'X' or 'O'!")
-  //       chooseSide()
-  //   }
-  // }
-
-  def chooseSmallBoard(): Int / {WrongInput} = {
-    println("Choose the Small Board[1 - 9]:")
-    val sBNumber: String = do readLine()
-    if (not(any(Numbers) {elem => elem == sBNumber})) {
-      do WrongInput("Invalid input. Please type a number from 1 to 9.")
-      chooseSmallBoard()
-    }else {
-      with on[WrongFormat].panic
-      val num: Int = toInt(sBNumber)
-      num
+  def chooseSide(): Player / {WrongInput} = {
+    println("Choose the side[X, O]:")
+    val side = do readLine()
+    side match {
+      case "X" => Cross()
+      case "O" => Nought()
+      case _ =>
+        do WrongInput("Invalid player type. Please type 'X' or 'O'!")
+        chooseSide()
     }
   }
 
-  def gameLoop(): Unit / {WrongInput} = {
+  def chooseSmallBoard(bigBoards: BigBoards): Int / {WrongInput} = {
+    println("Choose the Small Board[1 - 9]:")
+    val smallBoardNumber: String = do readLine()
+    if (not(any(Numbers) {s => s == smallBoardNumber})) {
+      do WrongInput("Invalid input. Please type a number from 1 to 9.")
+      chooseSmallBoard(bigBoards)
+    }else {
+      with on[WrongFormat].panic
+      toInt(smallBoardNumber)
+    }
+  }
+
+  def chooseCell(bigBoards: BigBoards): Int / {WrongInput} = {
+    println("Choose the cell inside your Small Board")
+    val cellNumber: String = do readLine()
+    if (not(any(Numbers) {s => s == cellNumber})) {
+      do WrongInput("Invalid input. Please type a number from 1 to 9.")
+      chooseCell(bigBoards)
+    }else {
+      with on[WrongFormat].panic
+      toInt(cellNumber)
+    }
+  }
+
+  def gameLoop(player: Player): Unit / {WrongInput} = {
     var endGame: Bool = false
-    var currentGameBoard: BigBoard = generateNewBigBoard()
-    clearScreen()
-    renderBoard(currentGameBoard)
+    var currentGameBoard: BigBoards = generateNewBigBoard()
+    var currentSmallBoard: Int = 10
+    var currentCell: Int = 10
+    printGameScreen(currentGameBoard, player)
+
+    if (player is Cross()) {
+      println("You're starting the game!\nChoose the starting Small Board.")
+      currentSmallBoard = chooseSmallBoard(currentGameBoard)
+      currentGameBoard = newActiveSmallBoard(currentGameBoard, currentSmallBoard)
+      printGameScreen(currentGameBoard, player)
+      ()
+    } else {
+      println("The computer is starting the game!")
+    }
     while (not(endGame)){
-      var sB: Int = chooseSmallBoard()
-      println("Your Small Board is " ++ sB.show)
+      if (currentSmallBoard == 10) {
+        currentSmallBoard = chooseSmallBoard(currentGameBoard)
+        currentGameBoard = newActiveSmallBoard(currentGameBoard, currentSmallBoard)
+        printGameScreen(currentGameBoard, player)
+      }
+      currentCell = chooseCell(currentGameBoard)
+      currentGameBoard = checkNewCell(currentGameBoard, currentSmallBoard, currentCell, player)
+      
       ()
     }
   }
@@ -57,8 +85,6 @@ def playGame(): Unit = {
   println("Press enter to start the game.")
   do readLine()
   var play: Bool = true
-  
-  var currentGameBoard: BigBoard = generateNewBigBoard()
 
   var player: Player = Nought()
   while (play) {
@@ -67,21 +93,18 @@ def playGame(): Unit = {
     try{
 
       // Choosing a player side
-      // player = chooseSide()
+      player = chooseSide()
       
       // Starting the game
-      gameLoop()
-
-
+      gameLoop(player)
+      
 
     } with WrongInput { msg =>
       println(msg)
-      println("\n")
       resume(())
     }
     ()
   }
-  
   println("Goodbye!")
 }
 

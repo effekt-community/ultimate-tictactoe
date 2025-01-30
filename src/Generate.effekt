@@ -8,11 +8,38 @@ import src/lib
 /**
  * Generates a new BigBoard
  * Input : None
- * Output : BigBoard
+ * Output : BigBoards
  */
-def generateNewBigBoard(): BigBoard = {
-  val row1: Row = fill(3, Empty())
-  val smallBoard: SmallBoard = fill(3, row1)
-  val bigBoard: BigBoard = fill(3,fill(3, smallBoard))
-  bigBoard
+def generateNewBigBoard(): BigBoards = {
+  val smallBoard: SmallBoard = fill(9, Empty())
+  val bigBoard: BigBoard = fill(9, smallBoard)
+  BigBoards(bigBoard, smallBoard)
+}
+
+def newActiveSmallBoard(bigBoards: BigBoards, number: Int): BigBoards = {
+  with on[OutOfBounds].panic
+
+  var newBigBoard: BigBoard = bigBoards.bigBoard
+  var newSmallBoard: SmallBoard = newBigBoard.get(number - 1)
+  var counter: Int = 0
+  newSmallBoard.foreach {cell =>
+    cell match {
+      case Empty() => newSmallBoard = newSmallBoard.replace(counter, Active())
+      case _ => ()
+    }
+    counter = counter + 1
+    ()
+  }
+  newBigBoard = newBigBoard.replace(number - 1, newSmallBoard)
+  BigBoards(newBigBoard, bigBoards.smallCopy)
+}
+
+def checkNewCell(bigBoards: BigBoards, smallBoardNumber: Int, cellNumber: Int, player: Player): BigBoards = {
+  with on[OutOfBounds].panic
+
+  var newBigBoard: BigBoard = bigBoards.bigBoard
+  var newSmallBoard: SmallBoard = newBigBoard.get(smallBoardNumber - 1)
+  newSmallBoard = newSmallBoard.replace(cellNumber, Filled(player))
+  newBigBoard = newBigBoard.replace(smallBoardNumber - 1, newSmallBoard)
+  BigBoards(newBigBoard, bigBoards.smallCopy)
 }
