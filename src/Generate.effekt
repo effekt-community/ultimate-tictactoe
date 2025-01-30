@@ -1,9 +1,9 @@
 module src/Generate
 
-import src/lib
 import tty
 import io/console
 import stream
+import src/lib
 
 /**
  * Generates a new BigBoard
@@ -11,7 +11,7 @@ import stream
  * Output : BigBoard
  */
 def generateNewBigBoard(): BigBoard = {
-  val row1: Row = fill(3, "⚬")
+  val row1: Row = fill(3, Empty())
   val smallBoard: SmallBoard = fill(3, row1)
   val bigBoard: BigBoard = fill(3,fill(3, smallBoard))
   bigBoard

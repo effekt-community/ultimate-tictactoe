@@ -3,11 +3,23 @@ module src/lib
 effect WrongInput(msg: String): Unit
 
 
-type Row = List[String]
-type SmallBoard = List[List[String]]
-type BigBoard = List[List[SmallBoard]]
+type Player {
+  Nought()
+  Cross()
+}
 
-type Player = String
+type Cell {
+  Empty()
+  Active()
+  Filled(player: Player)
+
+  NewLine()
+  Separator()
+}
+
+type Row = List[Cell]
+type SmallBoard = List[Row]
+type BigBoard = List[List[SmallBoard]]
 
 val Numbers: List[String] = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
 

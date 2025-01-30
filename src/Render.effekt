@@ -6,9 +6,10 @@ import io/console
 import stream
 
 def renderBoard(board: BigBoard): Unit = {
+  with Formatted::formatting
   renderSeparator()
-  board.foreach {elem =>  // elem is a List[SmallBoard]
-    val bigRow: Row = createUnifiedRow(elem)
+  board.foreach {elem =>  // elem is a List[SmallBoard] -> List[List[List[Cell]]]
+    val bigRow: List[Cell] = createUnifiedRow(elem)
     renderRow(bigRow)
     renderSeparator()
     ()
@@ -16,48 +17,56 @@ def renderBoard(board: BigBoard): Unit = {
   ()
 }
 
-def renderRow(l: Row): Unit = {
-  val rowString: String = l.foldLeft("") { (acc, elem) =>
-    if (acc == "") {
-      elem ++ " "
-    }else { 
-      if (elem == "\n") {
-        acc ++ elem
-      }else {
-        acc ++ elem ++ " " 
+def renderRow(row: List[Cell]): Unit = {
+  with Formatted::formatting
+  var newRow: String = ""
+  row.foreach {c =>
+    c match {
+      case Empty() => newRow = newRow ++ "·".yellow ++ " "
+      case Active() => newRow = newRow ++ "◦".green ++ " "
+      case Filled(player) => player match {
+        case Cross() => newRow = newRow ++ "X".red ++ " "
+        case Nought() => newRow = newRow ++ "O".green ++ " "
       }
+      case NewLine() => newRow = newRow ++ "\n"
+      case Separator() => newRow = newRow ++ "|".magenta ++ " "
     }
   }
-  println(rowString)
+  println(newRow)
 }
 
 def renderSeparator(): Unit = {
-  var separator: List[String] = fill(11, "—")
-  separator = separator.replace(3, "+")
-  separator = separator.replace(7, "+")
-  renderRow(separator)
-  ()
+  with Formatted::formatting
+  var separator: List[String] = fill(11, "—".magenta)
+  separator = separator.replace(3, "+".magenta)
+  separator = separator.replace(7, "+".magenta)
+  println(separator.foldLeft("") { (acc, elem) => acc ++ elem ++ " "})
 }
 
-def createUnifiedRow(boardRow: List[SmallBoard]): List[String] = {
+def createUnifiedRow(boardRow: List[SmallBoard]): List[Cell] = {
   with on[OutOfBounds].panic // disable all the error messages
-  var unifiedRow: List[List[String]] = []
+
+  var unifiedRow: List[List[Cell]] = []
+
   var counterSmallBoard: Int = 0
   var counterRow: Int = 0
+
   while (counterRow < 3) {
     val smallBoard: SmallBoard = boardRow.get(counterSmallBoard)
+
     unifiedRow = unifiedRow.insert(unifiedRow.size(), smallBoard.get(counterRow)) // insert the row of the small board
+
     if (counterSmallBoard == 2) {
-      unifiedRow = unifiedRow.insert(unifiedRow.size(), ["\n"]) // new line symbol
+      unifiedRow = unifiedRow.insert(unifiedRow.size(), [NewLine()]) // new line symbol
       counterSmallBoard = 0
       counterRow = counterRow + 1
     } else {
-      unifiedRow = unifiedRow.insert(unifiedRow.size(), ["|"]) // insert the separator
+      unifiedRow = unifiedRow.insert(unifiedRow.size(), [Separator()]) // insert the separator
       counterSmallBoard = counterSmallBoard + 1
     }
     ()
   }
-  var resultRow: List[String] = unifiedRow.join()
-  resultRow = resultRow.deleteAt(resultRow.size() - 1) // remove the last new line symbol
+  var resultRow: List[Cell] = unifiedRow.join()
+  resultRow = resultRow.deleteAt(resultRow.size() - 1) // remove the last new line
   resultRow
 }

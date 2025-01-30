@@ -12,17 +12,17 @@ import src/Generate
 def playGame(): Unit = {
   with console
 
-  def chooseSide(): Player / {WrongInput} = {
-    println("Choose the side[X, O]:")
-    val side = do readLine()
-    side match {
-      case "X" => "X"
-      case "O" => "O"
-      case _ =>
-        do WrongInput("Invalid player type. Please type 'X' or 'O'!")
-        chooseSide()
-    }
-  }
+  // def chooseSide(): Player / {WrongInput} = {
+  //   println("Choose the side[X, O]:")
+  //   val side = do readLine()
+  //   side match {
+  //     case "X" => "X"
+  //     case "O" => "O"
+  //     case _ =>
+  //       do WrongInput("Invalid player type. Please type 'X' or 'O'!")
+  //       chooseSide()
+  //   }
+  // }
 
   def chooseSmallBoard(): Int / {WrongInput} = {
     println("Choose the Small Board[1 - 9]:")
@@ -60,14 +60,14 @@ def playGame(): Unit = {
   
   var currentGameBoard: BigBoard = generateNewBigBoard()
 
-  var player: Player = ""
+  var player: Player = Nought()
   while (play) {
 
 
     try{
 
       // Choosing a player side
-      player = chooseSide()
+      // player = chooseSide()
       
       // Starting the game
       gameLoop()
@@ -82,7 +82,7 @@ def playGame(): Unit = {
     ()
   }
   
-  println("Goodbye: " ++ player)
+  println("Goodbye!")
 }
 
 
