@@ -1,5 +1,7 @@
 module src/lib
 
+import io/console
+
 effect WrongInput(msg: String): Unit
 
 
@@ -67,4 +69,9 @@ def compare(list1: List[Int], list2: List[Int]): Bool = {
   }else{
     false
   }
+}
+
+def consoleInput(): String = {
+  with console
+  do readLine()
 }

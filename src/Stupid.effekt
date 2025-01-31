@@ -10,12 +10,10 @@ import src/Generate
 
 
 def playGame(): Unit = {
-  with console
 
   def chooseSide(): Player / {WrongInput} = {
     println("Choose the side[X, O]:")
-    val side = do readLine()
-
+    val side = consoleInput()
     side match {
       case "X" => Cross()
       case "O" => Nought()
@@ -26,32 +24,28 @@ def playGame(): Unit = {
   }
 
   def chooseSmallBoard(bigBoards: BigBoards): Int / {WrongInput} = {
-    with console
     println("Choose the Small Board[1 - 9]:")
-    val smallBoardNumber = do readLine()
+    val smallBoardNumber: String = consoleInput()
 
-    if (any(Numbers) {s => s == smallBoardNumber}) {
+    if (not(any(Numbers) {s => s == smallBoardNumber})) {
+      do WrongInput("Invalid input. Please type a number from 1 to 9.")
+      chooseSmallBoard(bigBoards)
+    }
+    else {
       with on[WrongFormat].panic
-      val tmp: Int = toInt(smallBoardNumber)
-      if (checkAvailableSmallBoard(bigBoards, tmp)){
-        tmp
+      val smallBoardNumber: Int = toInt(smallBoardNumber)
+      if (checkAvailableSmallBoard(bigBoards, smallBoardNumber)){
+        smallBoardNumber
       }else {
         do WrongInput("This Small Board is Already occupied. Please type a number for a valid Small Board.")
         chooseSmallBoard(bigBoards)
       }
     }
-    else {
-      do WrongInput("Invalid input. Please type a number from 1 to 9.")
-      chooseSmallBoard(bigBoards)
-    }
   }
 
   def chooseCell(bigBoards: BigBoards, smallBoardNumber: Int): Int / {WrongInput} = {
-    with console
-
     println("Choose the cell inside your Small Board")
-    val cellNumber = do readLine()
-
+    val cellNumber: String = consoleInput()
     if (not(any(Numbers) {s => s == cellNumber})) {
       do WrongInput("Invalid input. Please type a number from 1 to 9.")
       chooseCell(bigBoards, smallBoardNumber)
@@ -69,10 +63,6 @@ def playGame(): Unit = {
   }
 
   def gameLoop(player: Player): Unit / {WrongInput} = {
-    with console
-
-    with on[OutOfBounds].panic
-
     var endGame: Bool = false
 
     var gameBoard: BigBoards = generateNewBigBoard()
@@ -87,19 +77,14 @@ def playGame(): Unit = {
       println("You're starting the game!\nChoose the starting Small Board.")
       currentSmallBoard = chooseSmallBoard(gameBoard)
       gameBoard = newActiveSmallBoard(gameBoard, currentSmallBoard)
-      printGameScreen(gameBoard, player)
-      ()
     } else {
       println("You're starting the game!\nChoose the starting Small Board.")
       currentSmallBoard = chooseSmallBoard(gameBoard)
       gameBoard = newActiveSmallBoard(gameBoard, currentSmallBoard)
-      printGameScreen(gameBoard, player)
     }
 
     // INNER GAME LOOP OF ONE GAME
     while (not(endGame)){
-      
-
       if (currentSmallBoard == 10) {
         printGameScreen(gameBoard, currentPlayer)
         currentSmallBoard = chooseSmallBoard(gameBoard)
@@ -111,21 +96,19 @@ def playGame(): Unit = {
       currentCell = chooseCell(gameBoard, currentSmallBoard)
       gameBoard = checkNewCell(gameBoard, currentSmallBoard, currentCell, currentPlayer)
 
-
+      // Check the winning situation
+      with on[OutOfBounds].panic
+      if (checkWinSituation(gameBoard.bigBoard.get(currentSmallBoard - 1), player)){
+        println("\nYou won the Small Board![Enter]")
+        consoleInput()
+        gameBoard = fillWinningGameBoard(gameBoard, currentSmallBoard, currentPlayer)
+      }
 
       // After The Player's Move
       printGameScreen(gameBoard, currentPlayer)
       println("Excellent Move! Now Press the Enter to finish your turn.")
-      
 
-      // Check the winning situation
-      if (checkWinSituation(gameBoard.bigBoard.get(currentSmallBoard - 1), player)){
-        println("\nYou won the Small Board![Enter]")
-        gameBoard = fillWinningGameBoard(gameBoard, currentSmallBoard, currentPlayer)
-        printGameScreen(gameBoard, currentPlayer)
-      }
-
-      do readLine()
+      consoleInput()
 
       // Change The Current Player
       if(currentPlayer is Cross()) currentPlayer = Nought()
@@ -139,7 +122,7 @@ def playGame(): Unit = {
         currentCell = 10
       } else {
         gameBoard = deactivateSmallBoard(gameBoard, currentCell)
-        currentSmallBoard = 10
+        // currentSmallBoard = 10
       }
       ()
     }
@@ -153,7 +136,7 @@ def playGame(): Unit = {
   println("Welcome to the ULTIMATE TIC-TAC-TOE!")
   println("Press enter to start the game.")
 
-  do readLine()
+  consoleInput()
   
   var play: Bool = true
 

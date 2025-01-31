@@ -49,11 +49,13 @@ def deactivateSmallBoard(bigBoards: BigBoards, number: Int): BigBoards = {
   var newBigBoardSmallCopy: SmallBoard = bigBoards.smallCopy
   
   var newSmallBoard: SmallBoard = newBigBoard.get(number - 1)
-  if(newSmallBoard.get(number - 1) is Filled(Player)){
-    ()
-  }else {
-    newBigBoardSmallCopy = newBigBoardSmallCopy.replace(number - 1, Empty())
-  }
+  // if(newSmallBoard.get(number - 1) is Filled(Player)){
+  //   println("Oh, fuck!")
+  //   do readLine()
+  //   ()
+  // }else {
+  //   newBigBoardSmallCopy = newBigBoardSmallCopy.replace(number - 1, Empty())
+  // }
   var counter: Int = 0
 
 
@@ -94,7 +96,6 @@ def checkAvailableSmallBoard(bigBoards: BigBoards, cellNumber: Int): Bool = {
   cellType match {
     case Empty() => true
     case Active() => true
-    case Filled(Player) => false
     case _ => false
   }
 }
