@@ -20,7 +20,14 @@ def newActiveSmallBoard(bigBoards: BigBoards, number: Int): BigBoards = {
   with on[OutOfBounds].panic
 
   var newBigBoard: BigBoard = bigBoards.bigBoard
+  var newBigBoardSmallCopy: SmallBoard = bigBoards.smallCopy
   var newSmallBoard: SmallBoard = newBigBoard.get(number - 1)
+
+
+  // Making Active Cell in the Small Copy of the Big Board
+  newBigBoardSmallCopy = newBigBoardSmallCopy.replace(number - 1, Active())
+  
+  // Replacing all the Empty() cells with Active()
   var counter: Int = 0
   newSmallBoard.foreach {cell =>
     cell match {
@@ -30,8 +37,9 @@ def newActiveSmallBoard(bigBoards: BigBoards, number: Int): BigBoards = {
     counter = counter + 1
     ()
   }
+
   newBigBoard = newBigBoard.replace(number - 1, newSmallBoard)
-  BigBoards(newBigBoard, bigBoards.smallCopy)
+  BigBoards(newBigBoard, newBigBoardSmallCopy)
 }
 
 def deactivateSmallBoard(bigBoards: BigBoards, number: Int): BigBoards = {
@@ -40,6 +48,8 @@ def deactivateSmallBoard(bigBoards: BigBoards, number: Int): BigBoards = {
   var newBigBoard: BigBoard = bigBoards.bigBoard
   var newSmallBoard: SmallBoard = newBigBoard.get(number - 1)
   var counter: Int = 0
+
+
   newSmallBoard.foreach {cell =>
     cell match {
       case Active() => newSmallBoard = newSmallBoard.replace(counter, Empty())
@@ -62,8 +72,15 @@ def checkNewCell(bigBoards: BigBoards, smallBoardNumber: Int, cellNumber: Int, p
   BigBoards(newBigBoard, bigBoards.smallCopy)
 }
 
+/*
+ * Returns true if the Small Board is  free.
+ * False Otherwise
+ * Input : BigBoards, SmallBoardNumber, Cell Number
+ * Output : Boolean
+ */
 def checkAvailableSmallBoard(bigBoards: BigBoards, cellNumber: Int): Bool = {
   with on[OutOfBounds].panic
+
   val cellType: Cell = bigBoards.smallCopy.get(cellNumber - 1)
   if (cellType is Empty()) true
   else false
@@ -71,17 +88,42 @@ def checkAvailableSmallBoard(bigBoards: BigBoards, cellNumber: Int): Bool = {
 
 
 /*
- * Returns true if the cell is occupied.
+ * Returns true if the cell is  free.
  * False Otherwise
  * Input : BigBoards, SmallBoardNumber, Cell Number
  * Output : Boolean
  */
-def checkOccupiedCell(bigBoards: BigBoards, smallBoardNumber: Int, cellNumber: Int): Bool = {
+def checkAvailableCell(bigBoards: BigBoards, smallBoardNumber: Int, cellNumber: Int): Bool = {
   with on[OutOfBounds].panic
-  
+
   var newBigBoard: BigBoard = bigBoards.bigBoard
   var newSmallBoard: SmallBoard = newBigBoard.get(smallBoardNumber - 1)
   val cellType: Cell = newSmallBoard.get(cellNumber - 1)
-  if (cellType is Active()) false
-  else true
+  if (cellType is Active()) true
+  else false
+}
+
+/*
+ * Returns true if Current Player has won in this Small Board.
+ * False Otherwise
+ * Input : BigBoards, SmallBoardNumber, Cell Number
+ * Output : Boolean
+ */
+def checkWinSituation(smallBoard: SmallBoard, player: Player): Bool = {
+  var checkedCells: List[Int] = empty()
+  var counter: Int = 0
+  var win: Bool = true
+  smallBoard.foreach {cell =>
+    cell match {
+      case Filled(player) => checkedCells = checkedCells.insert(checkedCells.size(), counter)
+      case _ => ()
+    }
+    counter = counter + 1
+  }
+  winCombinations.foreach { combination =>
+    if(combination.compare(checkedCells)){
+      win = true
+    }
+  }
+  win
 }

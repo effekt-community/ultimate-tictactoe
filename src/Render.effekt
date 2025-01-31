@@ -29,7 +29,8 @@ def renderRow(row: List[Cell]): Unit = {
   row.foreach {c =>
     c match {
       case Empty() => newRow = newRow ++ "·".yellow ++ " "
-      case Active() => newRow = newRow ++ "◦".green ++ " "
+      case Draw() => newRow = newRow ++ "—".yellow ++ " "
+      case Active() => newRow = newRow ++ "◦".cyan ++ " "
       case Filled(player) => player match {
         case Cross() => newRow = newRow ++ "X".red ++ " "
         case Nought() => newRow = newRow ++ "O".green ++ " "

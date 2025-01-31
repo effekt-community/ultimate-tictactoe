@@ -27,12 +27,21 @@ def playGame(): Unit = {
   def chooseSmallBoard(bigBoards: BigBoards): Int / {WrongInput} = {
     println("Choose the Small Board[1 - 9]:")
     val smallBoardNumber: String = do readLine()
+    
     if (not(any(Numbers) {s => s == smallBoardNumber})) {
       do WrongInput("Invalid input. Please type a number from 1 to 9.")
       chooseSmallBoard(bigBoards)
-    }else {
+    }
+    else {
       with on[WrongFormat].panic
-      toInt(smallBoardNumber)
+      val smallBoardNumber: Int = toInt(smallBoardNumber)
+
+      if (checkAvailableSmallBoard(bigBoards, smallBoardNumber)){
+        smallBoardNumber
+      }else {
+        do WrongInput("This Small Board is Already occupied. Please type a number for a valid Small Board.")
+        chooseSmallBoard(bigBoards)
+      }
     }
   }
 
@@ -46,49 +55,56 @@ def playGame(): Unit = {
       with on[WrongFormat].panic
       val cellNumberInt = toInt(cellNumber)
 
-      if(checkOccupiedCell(bigBoards, smallBoardNumber, cellNumberInt)){
+      if(checkAvailableCell(bigBoards, smallBoardNumber, cellNumberInt)){
+        cellNumberInt
+      }else{
         do WrongInput("This Cell is Already occupied. Please type a number for a valid cell.")
         chooseCell(bigBoards, smallBoardNumber)
-      }else{
-        cellNumberInt
       }
     }
   }
 
   def gameLoop(player: Player): Unit / {WrongInput} = {
+
     var endGame: Bool = false
-    var currentGameBoard: BigBoards = generateNewBigBoard()
+
+    var gameBoard: BigBoards = generateNewBigBoard()
     var currentSmallBoard: Int = 10
     var currentCell: Int = 10
+
     var currentPlayer: Player = player
-    printGameScreen(currentGameBoard, player)
+
+    printGameScreen(gameBoard, player)
 
     if (currentPlayer is Cross()) {
       println("You're starting the game!\nChoose the starting Small Board.")
-      currentSmallBoard = chooseSmallBoard(currentGameBoard)
-      currentGameBoard = newActiveSmallBoard(currentGameBoard, currentSmallBoard)
-      printGameScreen(currentGameBoard, player)
+      currentSmallBoard = chooseSmallBoard(gameBoard)
+      gameBoard = newActiveSmallBoard(gameBoard, currentSmallBoard)
+      printGameScreen(gameBoard, player)
       ()
     } else {
-      // println("The computer is starting the game!")
       println("You're starting the game!\nChoose the starting Small Board.")
-      currentSmallBoard = chooseSmallBoard(currentGameBoard)
-      currentGameBoard = newActiveSmallBoard(currentGameBoard, currentSmallBoard)
-      printGameScreen(currentGameBoard, player)
+      currentSmallBoard = chooseSmallBoard(gameBoard)
+      gameBoard = newActiveSmallBoard(gameBoard, currentSmallBoard)
+      printGameScreen(gameBoard, player)
     }
+
+    // INNER GAME LOOP OF ONE GAME
     while (not(endGame)){
+      
+
       if (currentSmallBoard == 10) {
-        currentSmallBoard = chooseSmallBoard(currentGameBoard)
-        currentGameBoard = newActiveSmallBoard(currentGameBoard, currentSmallBoard)
+        currentSmallBoard = chooseSmallBoard(gameBoard)
+        gameBoard = newActiveSmallBoard(gameBoard, currentSmallBoard)
       }
 
       // Before The Player's Move
-      printGameScreen(currentGameBoard, currentPlayer)
-      currentCell = chooseCell(currentGameBoard, currentSmallBoard)
-      currentGameBoard = checkNewCell(currentGameBoard, currentSmallBoard, currentCell, currentPlayer)
+      printGameScreen(gameBoard, currentPlayer)
+      currentCell = chooseCell(gameBoard, currentSmallBoard)
+      gameBoard = checkNewCell(gameBoard, currentSmallBoard, currentCell, currentPlayer)
 
       // After The Player's Move
-      printGameScreen(currentGameBoard, currentPlayer)
+      printGameScreen(gameBoard, currentPlayer)
       println("Excellent Move! Now Press the Enter to finish your turn.")
       do readLine()
 
@@ -97,13 +113,13 @@ def playGame(): Unit = {
       else currentPlayer = Cross()
 
       // Change the Current Small Board
-      if (checkAvailableSmallBoard(currentGameBoard, currentCell)){
-        currentGameBoard = deactivateSmallBoard(currentGameBoard, currentSmallBoard)
+      if (checkAvailableSmallBoard(gameBoard, currentCell)){
+        gameBoard = deactivateSmallBoard(gameBoard, currentSmallBoard)
         currentSmallBoard = currentCell
-        currentGameBoard = newActiveSmallBoard(currentGameBoard, currentSmallBoard)
+        gameBoard = newActiveSmallBoard(gameBoard, currentSmallBoard)
         currentCell = 10
       } else {
-        currentGameBoard = deactivateSmallBoard(currentGameBoard, currentCell)
+        gameBoard = deactivateSmallBoard(gameBoard, currentCell)
       }
       ()
     }
@@ -113,23 +129,23 @@ def playGame(): Unit = {
 
   clearScreen()
 
+  // Greeting Message
   println("Welcome to the ULTIMATE TIC-TAC-TOE!")
   println("Press enter to start the game.")
+
   do readLine()
+  
   var play: Bool = true
 
   var player: Player = Nought()
   while (play) {
 
-
     try{
-
       // Choosing a player side
       player = chooseSide()
-      
+
       // Starting the game
       gameLoop(player)
-      
 
     } with WrongInput { msg =>
       println(msg)

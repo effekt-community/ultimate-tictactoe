@@ -12,6 +12,7 @@ type Cell {
   Empty()
   Active()
   Filled(player: Player)
+  Draw()
 
   NewLine()
   Separator()
@@ -21,6 +22,7 @@ type SmallBoard = List[Cell]
 type BigBoard = List[SmallBoard]
 
 val Numbers: List[String] = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
+val winCombinations: List[List[Int]] = [[0,1,2], [3,4,5], [6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]
 
 record BigBoards(bigBoard: BigBoard, smallCopy: SmallBoard)
 
@@ -40,4 +42,29 @@ def playerString(player: Player): String = {
 
 def newLine(): Unit = {
   println("\n")
+}
+
+/*
+ * Compares two lists and gives true if they're the same
+ * Input: list1, list2
+ * Output: Bool
+*/
+def compare(list1: List[Int], list2: List[Int]): Bool = {
+  with on[OutOfBounds].panic
+
+  
+  if ((list1.size == list2.size) && not(list1.size == 0)){
+    var counter: Int = 0
+    var output: Bool = true
+    while (counter < list1.size && output){
+      if(list1.get(counter) == list2.get(counter)){
+        counter = counter + 1
+      } else {
+        output = false
+      }
+    }
+    output
+  }else{
+    false
+  }
 }
