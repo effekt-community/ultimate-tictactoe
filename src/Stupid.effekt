@@ -36,15 +36,22 @@ def playGame(): Unit = {
     }
   }
 
-  def chooseCell(bigBoards: BigBoards): Int / {WrongInput} = {
+  def chooseCell(bigBoards: BigBoards, smallBoardNumber: Int): Int / {WrongInput} = {
     println("Choose the cell inside your Small Board")
     val cellNumber: String = do readLine()
     if (not(any(Numbers) {s => s == cellNumber})) {
       do WrongInput("Invalid input. Please type a number from 1 to 9.")
-      chooseCell(bigBoards)
+      chooseCell(bigBoards, smallBoardNumber)
     }else {
       with on[WrongFormat].panic
-      toInt(cellNumber)
+      val cellNumberInt = toInt(cellNumber)
+
+      if(checkOccupiedCell(bigBoards, smallBoardNumber, cellNumberInt)){
+        do WrongInput("This Cell is Already occupied. Please type a number for a valid cell.")
+        chooseCell(bigBoards, smallBoardNumber)
+      }else{
+        cellNumberInt
+      }
     }
   }
 
@@ -63,23 +70,33 @@ def playGame(): Unit = {
       printGameScreen(currentGameBoard, player)
       ()
     } else {
-      println("The computer is starting the game!")
+      // println("The computer is starting the game!")
+      println("You're starting the game!\nChoose the starting Small Board.")
+      currentSmallBoard = chooseSmallBoard(currentGameBoard)
+      currentGameBoard = newActiveSmallBoard(currentGameBoard, currentSmallBoard)
+      printGameScreen(currentGameBoard, player)
     }
     while (not(endGame)){
       if (currentSmallBoard == 10) {
         currentSmallBoard = chooseSmallBoard(currentGameBoard)
         currentGameBoard = newActiveSmallBoard(currentGameBoard, currentSmallBoard)
       }
+
+      // Before The Player's Move
       printGameScreen(currentGameBoard, currentPlayer)
-      currentCell = chooseCell(currentGameBoard)
+      currentCell = chooseCell(currentGameBoard, currentSmallBoard)
       currentGameBoard = checkNewCell(currentGameBoard, currentSmallBoard, currentCell, currentPlayer)
 
+      // After The Player's Move
       printGameScreen(currentGameBoard, currentPlayer)
       println("Excellent Move! Now Press the Enter to finish your turn.")
       do readLine()
 
+      // Change The Current Player
       if(currentPlayer is Cross()) currentPlayer = Nought()
       else currentPlayer = Cross()
+
+      // Change the Current Small Board
       if (checkAvailableSmallBoard(currentGameBoard, currentCell)){
         currentGameBoard = deactivateSmallBoard(currentGameBoard, currentSmallBoard)
         currentSmallBoard = currentCell

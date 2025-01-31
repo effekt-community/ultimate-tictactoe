@@ -68,3 +68,20 @@ def checkAvailableSmallBoard(bigBoards: BigBoards, cellNumber: Int): Bool = {
   if (cellType is Empty()) true
   else false
 }
+
+
+/*
+ * Returns true if the cell is occupied.
+ * False Otherwise
+ * Input : BigBoards, SmallBoardNumber, Cell Number
+ * Output : Boolean
+ */
+def checkOccupiedCell(bigBoards: BigBoards, smallBoardNumber: Int, cellNumber: Int): Bool = {
+  with on[OutOfBounds].panic
+  
+  var newBigBoard: BigBoard = bigBoards.bigBoard
+  var newSmallBoard: SmallBoard = newBigBoard.get(smallBoardNumber - 1)
+  val cellType: Cell = newSmallBoard.get(cellNumber - 1)
+  if (cellType is Active()) false
+  else true
+}
