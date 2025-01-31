@@ -46,7 +46,14 @@ def deactivateSmallBoard(bigBoards: BigBoards, number: Int): BigBoards = {
   with on[OutOfBounds].panic
 
   var newBigBoard: BigBoard = bigBoards.bigBoard
+  var newBigBoardSmallCopy: SmallBoard = bigBoards.smallCopy
+  
   var newSmallBoard: SmallBoard = newBigBoard.get(number - 1)
+  if(newSmallBoard.get(number - 1) is Filled(Player)){
+    ()
+  }else {
+    newBigBoardSmallCopy = newBigBoardSmallCopy.replace(number - 1, Empty())
+  }
   var counter: Int = 0
 
 
@@ -59,7 +66,7 @@ def deactivateSmallBoard(bigBoards: BigBoards, number: Int): BigBoards = {
     ()
   }
   newBigBoard = newBigBoard.replace(number - 1, newSmallBoard)
-  BigBoards(newBigBoard, bigBoards.smallCopy)
+  BigBoards(newBigBoard, newBigBoardSmallCopy)
 }
 
 def checkNewCell(bigBoards: BigBoards, smallBoardNumber: Int, cellNumber: Int, player: Player): BigBoards = {
@@ -79,11 +86,17 @@ def checkNewCell(bigBoards: BigBoards, smallBoardNumber: Int, cellNumber: Int, p
  * Output : Boolean
  */
 def checkAvailableSmallBoard(bigBoards: BigBoards, cellNumber: Int): Bool = {
+  with console
   with on[OutOfBounds].panic
 
   val cellType: Cell = bigBoards.smallCopy.get(cellNumber - 1)
-  if (cellType is Empty()) true
-  else false
+
+  cellType match {
+    case Empty() => true
+    case Active() => true
+    case Filled(Player) => false
+    case _ => false
+  }
 }
 
 
@@ -106,13 +119,13 @@ def checkAvailableCell(bigBoards: BigBoards, smallBoardNumber: Int, cellNumber: 
 /*
  * Returns true if Current Player has won in this Small Board.
  * False Otherwise
- * Input : BigBoards, SmallBoardNumber, Cell Number
+ * Input : SmallBoardNumber, player
  * Output : Boolean
  */
 def checkWinSituation(smallBoard: SmallBoard, player: Player): Bool = {
   var checkedCells: List[Int] = empty()
   var counter: Int = 0
-  var win: Bool = true
+  var win: Bool = false
   smallBoard.foreach {cell =>
     cell match {
       case Filled(player) => checkedCells = checkedCells.insert(checkedCells.size(), counter)
@@ -120,10 +133,24 @@ def checkWinSituation(smallBoard: SmallBoard, player: Player): Bool = {
     }
     counter = counter + 1
   }
+  counter = 0
+  // Here we are checking if all three elements from the win combination are in the 
+  // Checked cells list
   winCombinations.foreach { combination =>
-    if(combination.compare(checkedCells)){
-      win = true
+    combination.foreach { el =>
+      if(any(checkedCells) {cell => cell == el}) counter = counter + 1
     }
+    if (counter == 3) win = true
+    else counter = 0
   }
   win
+}
+
+def fillWinningGameBoard(bigBoards: BigBoards, smallBoardNumber: Int, player: Player): BigBoards = {
+  var newBigBoard: BigBoard = bigBoards.bigBoard
+  var newBigBoardSmallCopy: SmallBoard = bigBoards.smallCopy
+
+  newBigBoard = newBigBoard.replace(smallBoardNumber - 1, fill(9, Filled(player)))
+  newBigBoardSmallCopy = newBigBoardSmallCopy.replace(smallBoardNumber - 1, Filled(player))
+  BigBoards(newBigBoard, newBigBoardSmallCopy)
 }

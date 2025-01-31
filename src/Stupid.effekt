@@ -15,6 +15,7 @@ def playGame(): Unit = {
   def chooseSide(): Player / {WrongInput} = {
     println("Choose the side[X, O]:")
     val side = do readLine()
+
     side match {
       case "X" => Cross()
       case "O" => Nought()
@@ -25,29 +26,32 @@ def playGame(): Unit = {
   }
 
   def chooseSmallBoard(bigBoards: BigBoards): Int / {WrongInput} = {
+    with console
     println("Choose the Small Board[1 - 9]:")
-    val smallBoardNumber: String = do readLine()
-    
-    if (not(any(Numbers) {s => s == smallBoardNumber})) {
-      do WrongInput("Invalid input. Please type a number from 1 to 9.")
-      chooseSmallBoard(bigBoards)
-    }
-    else {
-      with on[WrongFormat].panic
-      val smallBoardNumber: Int = toInt(smallBoardNumber)
+    val smallBoardNumber = do readLine()
 
-      if (checkAvailableSmallBoard(bigBoards, smallBoardNumber)){
-        smallBoardNumber
+    if (any(Numbers) {s => s == smallBoardNumber}) {
+      with on[WrongFormat].panic
+      val tmp: Int = toInt(smallBoardNumber)
+      if (checkAvailableSmallBoard(bigBoards, tmp)){
+        tmp
       }else {
         do WrongInput("This Small Board is Already occupied. Please type a number for a valid Small Board.")
         chooseSmallBoard(bigBoards)
       }
     }
+    else {
+      do WrongInput("Invalid input. Please type a number from 1 to 9.")
+      chooseSmallBoard(bigBoards)
+    }
   }
 
   def chooseCell(bigBoards: BigBoards, smallBoardNumber: Int): Int / {WrongInput} = {
+    with console
+
     println("Choose the cell inside your Small Board")
-    val cellNumber: String = do readLine()
+    val cellNumber = do readLine()
+
     if (not(any(Numbers) {s => s == cellNumber})) {
       do WrongInput("Invalid input. Please type a number from 1 to 9.")
       chooseCell(bigBoards, smallBoardNumber)
@@ -65,6 +69,9 @@ def playGame(): Unit = {
   }
 
   def gameLoop(player: Player): Unit / {WrongInput} = {
+    with console
+
+    with on[OutOfBounds].panic
 
     var endGame: Bool = false
 
@@ -94,6 +101,7 @@ def playGame(): Unit = {
       
 
       if (currentSmallBoard == 10) {
+        printGameScreen(gameBoard, currentPlayer)
         currentSmallBoard = chooseSmallBoard(gameBoard)
         gameBoard = newActiveSmallBoard(gameBoard, currentSmallBoard)
       }
@@ -103,9 +111,20 @@ def playGame(): Unit = {
       currentCell = chooseCell(gameBoard, currentSmallBoard)
       gameBoard = checkNewCell(gameBoard, currentSmallBoard, currentCell, currentPlayer)
 
+
+
       // After The Player's Move
       printGameScreen(gameBoard, currentPlayer)
       println("Excellent Move! Now Press the Enter to finish your turn.")
+      
+
+      // Check the winning situation
+      if (checkWinSituation(gameBoard.bigBoard.get(currentSmallBoard - 1), player)){
+        println("\nYou won the Small Board![Enter]")
+        gameBoard = fillWinningGameBoard(gameBoard, currentSmallBoard, currentPlayer)
+        printGameScreen(gameBoard, currentPlayer)
+      }
+
       do readLine()
 
       // Change The Current Player
@@ -120,6 +139,7 @@ def playGame(): Unit = {
         currentCell = 10
       } else {
         gameBoard = deactivateSmallBoard(gameBoard, currentCell)
+        currentSmallBoard = 10
       }
       ()
     }
