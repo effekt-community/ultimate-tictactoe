@@ -4,16 +4,17 @@ import io/console
 
 effect WrongInput(msg: String): Unit
 
+type GameMode {
+  Local()
+  Computer()
+}
 
 type Cell {
   Empty()
   Active()
-
   Nought()
   Cross()
-  
   Draw()
-
   NewLine()
   Separator()
 }

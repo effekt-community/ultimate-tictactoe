@@ -11,6 +11,20 @@ import src/Generate
 
 def playGame(): Unit = {
 
+  // Returns the chosen Game Mode
+  def chooseGameMode(): GameMode / {WrongInput} = {
+    println("Choose the Game Mode:\n[1 - 2 Players, 2 - vs Computer]:")
+    val side = consoleInput()
+    side match {
+      case "1" => Local()
+      case "2" => Computer()
+      case _ =>
+        do WrongInput("Invalid Game Mode. Please type '1' or '2'!")
+        chooseGameMode()
+    }
+  }
+
+  // Returns the Cell type for the side
   def chooseSide(): Cell / {WrongInput} = {
     println("Choose the side[X, O]:")
     val side = consoleInput()
@@ -23,69 +37,86 @@ def playGame(): Unit = {
     }
   }
 
-  def chooseSmallBoard(bigBoards: BigBoards): Int / {WrongInput} = {
+
+  // Returns the Small Board Number [0 - 8]
+  def chooseSmallBoard(gameBoard: BigBoards): Int / {WrongInput} = {
     println("Choose the Small Board[1 - 9]:")
     val smallBoardNumber: String = consoleInput()
 
     if (not(any(Numbers) {s => s == smallBoardNumber})) {
       do WrongInput("Invalid input. Please type a number from 1 to 9.")
-      chooseSmallBoard(bigBoards)
+      chooseSmallBoard(gameBoard)
     }
     else {
       with on[WrongFormat].panic
       val smallBoardNumber: Int = toInt(smallBoardNumber)
-      if (checkAvailableSmallBoard(bigBoards, smallBoardNumber)){
-        smallBoardNumber
+      if (checkAvailableCell(gameBoard.smallCopy, smallBoardNumber - 1)){
+        smallBoardNumber - 1
       }else {
         do WrongInput("This Small Board is Already occupied. Please type a number for a valid Small Board.")
-        chooseSmallBoard(bigBoards)
+        chooseSmallBoard(gameBoard)
       }
     }
   }
 
-  def chooseCell(bigBoards: BigBoards, smallBoardNumber: Int): Int / {WrongInput} = {
+  // Returns the chosen Cell inside the board [0 - 8]
+  def chooseCell(gameBoard: BigBoards, smallBoardNumber: Int): Int / {WrongInput} = {
+    with on[OutOfBounds].panic
+
     println("Choose the cell inside your Small Board")
     val cellNumber: String = consoleInput()
     if (not(any(Numbers) {s => s == cellNumber})) {
       do WrongInput("Invalid input. Please type a number from 1 to 9.")
-      chooseCell(bigBoards, smallBoardNumber)
+      chooseCell(gameBoard, smallBoardNumber)
     }else {
       with on[WrongFormat].panic
       val cellNumberInt = toInt(cellNumber)
 
-      if(checkAvailableCell(bigBoards, smallBoardNumber, cellNumberInt)){
-        cellNumberInt
+      if(checkAvailableCell(gameBoard.bigBoard.get(smallBoardNumber), cellNumberInt - 1)){
+        cellNumberInt - 1
       }else{
         do WrongInput("This Cell is Already occupied. Please type a number for a valid cell.")
-        chooseCell(bigBoards, smallBoardNumber)
+        chooseCell(gameBoard, smallBoardNumber)
       }
     }
   }
 
-  def gameLoop(player: Cell): Unit / {WrongInput} = {
+  def gameLoop(player: Cell, gameMode: GameMode): Unit / {WrongInput} = {
     var endGame: Bool = false
 
     var gameBoard: BigBoards = generateNewBigBoard()
     var currentSmallBoard: Int = 10
     var currentCell: Int = 10
+    
+    var computer: Cell = Cross()
+    if (player is Cross()) computer = Nought()
 
-    var currentPlayer: Cell = player
+    var currentPlayer: Cell = Cross()
 
     printGameScreen(gameBoard, player)
 
-    if (currentPlayer is Cross()) {
+    if (player is Cross()) {
       println("You're starting the game!\nChoose the starting Small Board.")
       currentSmallBoard = chooseSmallBoard(gameBoard)
       gameBoard = newActiveSmallBoard(gameBoard, currentSmallBoard)
     } else {
-      println("You're starting the game!\nChoose the starting Small Board.")
-      currentSmallBoard = chooseSmallBoard(gameBoard)
-      gameBoard = newActiveSmallBoard(gameBoard, currentSmallBoard)
+      println("Opponent is starting the game!\nChoose the starting Small Board.")
+      if (gameMode is Computer()){
+        currentSmallBoard = computerPlay(gameBoard.smallCopy, computer)
+        gameBoard = newActiveSmallBoard(gameBoard, currentSmallBoard)
+      }else{
+        currentSmallBoard = chooseSmallBoard(gameBoard)
+        gameBoard = newActiveSmallBoard(gameBoard, currentSmallBoard)
+      }
     }
 
     // INNER GAME LOOP OF ONE GAME
     while (not(endGame)){
       if (currentSmallBoard == 10) {
+        if (isComputerTurn(currentPlayer, computer)){
+          currentSmallBoard = computerPlay(gameBoard.smallCopy, computer)
+          gameBoard = newActiveSmallBoard(gameBoard, currentSmallBoard)
+        }
         printGameScreen(gameBoard, currentPlayer)
         currentSmallBoard = chooseSmallBoard(gameBoard)
         gameBoard = newActiveSmallBoard(gameBoard, currentSmallBoard)
@@ -111,11 +142,6 @@ def playGame(): Unit = {
         }
         case _ => ()
       }
-      // if (checkWinSituation(gameBoard.bigBoard.get(currentSmallBoard - 1), currentPlayer) is Win()){
-      //   println("\nYou won the Small Board!")
-      //   consoleInput()
-      //   gameBoard = fillWinningGameBoard(gameBoard, currentSmallBoard, currentPlayer)
-      // }
 
       // After The Player's Move
       printGameScreen(gameBoard, currentPlayer)
@@ -124,7 +150,7 @@ def playGame(): Unit = {
       consoleInput()
 
       // Change the Current Small Board
-      if (checkAvailableSmallBoard(gameBoard, currentCell)){
+      if (checkAvailableCell(gameBoard.smallCopy, currentCell)){
         gameBoard = deactivateSmallBoard(gameBoard, currentSmallBoard)
         currentSmallBoard = currentCell
         gameBoard = newActiveSmallBoard(gameBoard, currentSmallBoard)
@@ -174,14 +200,19 @@ def playGame(): Unit = {
   var play: Bool = true
 
   var player: Cell = Nought()
+
+  var gameMode: GameMode = Local()
   while (play) {
 
     try{
+      // Choosing a Game Mode
+      gameMode = chooseGameMode()
+
       // Choosing a player side
       player = chooseSide()
 
       // Starting the game
-      gameLoop(player)
+      gameLoop(player, gameMode)
 
     } with WrongInput { msg =>
       println(msg)
