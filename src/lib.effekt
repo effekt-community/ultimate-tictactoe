@@ -5,20 +5,23 @@ import io/console
 effect WrongInput(msg: String): Unit
 
 
-// type Player {
-//   Nought()
-//   Cross()
-// }
-
 type Cell {
   Empty()
   Active()
+
   Nought()
   Cross()
+  
   Draw()
 
   NewLine()
   Separator()
+}
+
+type WinBoard {
+  Win()
+  Loose()
+  Nope()
 }
 
 type SmallBoard = List[Cell]

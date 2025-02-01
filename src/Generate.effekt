@@ -116,15 +116,12 @@ def checkAvailableCell(bigBoards: BigBoards, smallBoardNumber: Int, cellNumber: 
  * Input : SmallBoardNumber, player
  * Output : Boolean
  */
-def checkWinSituation(smallBoard: SmallBoard, player: Cell): Bool = {
+def checkWinSituation(smallBoard: SmallBoard, player: Cell): WinBoard = {
   var cr: Bool = true
   if (player is Cross()) cr = true else cr = false
-  inspect(player)
-  inspect(cr)
-  consoleInput()
   var checkedCells: List[Int] = empty()
   var counter: Int = 0
-  var win: Bool = false
+  var win: WinBoard = Nope()
   
   smallBoard.foreach {cell =>
     cell match {
@@ -135,16 +132,29 @@ def checkWinSituation(smallBoard: SmallBoard, player: Cell): Bool = {
     counter = counter + 1
   }
   counter = 0
-  inspect(checkedCells)
-  consoleInput()
   // Here we are checking if all three elements from the win combination are in the
   // Checked cells list
   winCombinations.foreach { combination =>
     combination.foreach { el =>
       if(any(checkedCells) {cell => cell == el}) counter = counter + 1
     }
-    if (counter == 3) win = true
+    if (counter == 3) win = Win()
     else counter = 0
+  }
+
+  // Check if there's a draw in board
+  counter = 0
+  if (win is Nope()){
+      smallBoard.foreach {cell =>
+      cell match {
+        case Cross() => counter = counter + 1
+        case Nought() => counter = counter + 1
+        case _ => ()
+      }
+      if (counter == 9) {
+        win = Loose()
+      }
+    }
   }
   win
 }

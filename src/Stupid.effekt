@@ -98,22 +98,30 @@ def playGame(): Unit = {
 
       // Check the winning situation
       with on[OutOfBounds].panic
-      if (checkWinSituation(gameBoard.bigBoard.get(currentSmallBoard - 1), currentPlayer)){
-        consoleInput()
-        println("\nYou won the Small Board![Enter]")
-        consoleInput()
-        gameBoard = fillWinningGameBoard(gameBoard, currentSmallBoard, currentPlayer)
+      checkWinSituation(gameBoard.bigBoard.get(currentSmallBoard - 1), currentPlayer) match {
+        case Win() => {
+          println("\nYou won the Small Board!")
+          consoleInput()
+          gameBoard = fillWinningGameBoard(gameBoard, currentSmallBoard, currentPlayer)
+        }
+        case Loose() => {
+          println("\n It's a draw in the Small Board!")
+          consoleInput()
+          gameBoard = fillWinningGameBoard(gameBoard, currentSmallBoard, Draw())
+        }
+        case _ => ()
       }
+      // if (checkWinSituation(gameBoard.bigBoard.get(currentSmallBoard - 1), currentPlayer) is Win()){
+      //   println("\nYou won the Small Board!")
+      //   consoleInput()
+      //   gameBoard = fillWinningGameBoard(gameBoard, currentSmallBoard, currentPlayer)
+      // }
 
       // After The Player's Move
       printGameScreen(gameBoard, currentPlayer)
       println("Excellent Move! Now Press the Enter to finish your turn.")
 
       consoleInput()
-
-      // Change The Current Player
-      if(currentPlayer is Cross()) currentPlayer = Nought()
-      else currentPlayer = Cross()
 
       // Change the Current Small Board
       if (checkAvailableSmallBoard(gameBoard, currentCell)){
@@ -125,6 +133,30 @@ def playGame(): Unit = {
         gameBoard = deactivateSmallBoard(gameBoard, currentSmallBoard)
         currentSmallBoard = 10
       }
+
+      // Verify if the game has been won
+      if (checkWinSituation(gameBoard.smallCopy, currentPlayer) is Win()){
+        println(playerString(currentPlayer) ++ ", You won the game!")
+        consoleInput()
+        endGame = true
+      }
+
+      checkWinSituation(gameBoard.smallCopy, currentPlayer) match {
+        case Win() => {
+          println(playerString(currentPlayer) ++ ", You won the game!")
+          consoleInput()
+          endGame = true
+        }
+        case Loose() => {
+          println(playerString(currentPlayer) ++ ", You lost the game!")
+          consoleInput()
+          endGame = true
+        }
+        case _ => ()
+      }
+      // Change The Current Player
+      if(currentPlayer is Cross()) currentPlayer = Nought()
+      else currentPlayer = Cross()
       ()
     }
   }
