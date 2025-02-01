@@ -5,15 +5,16 @@ import io/console
 effect WrongInput(msg: String): Unit
 
 
-type Player {
-  Nought()
-  Cross()
-}
+// type Player {
+//   Nought()
+//   Cross()
+// }
 
 type Cell {
   Empty()
   Active()
-  Filled(player: Player)
+  Nought()
+  Cross()
   Draw()
 
   NewLine()
@@ -30,20 +31,12 @@ record BigBoards(bigBoard: BigBoard, smallCopy: SmallBoard)
 
 def helloWorld(): String = "Hello, world!"
 
-def clearScreen(): Unit = {
-  println("\u001b[2J") // clear the screen
-  println("\u001b[H") // move the cursor to the top left corner
-}
-
-def playerString(player: Player): String = {
+def playerString(player: Cell): String = {
   player match {
     case Cross() => "X"
     case Nought() => "O"
+    case _ => ""
   }
-}
-
-def newLine(): Unit = {
-  println("\n")
 }
 
 /*
@@ -74,4 +67,13 @@ def compare(list1: List[Int], list2: List[Int]): Bool = {
 def consoleInput(): String = {
   with console
   do readLine()
+}
+
+def clearScreen(): Unit = {
+  println("\u001b[2J") // clear the screen
+  println("\u001b[H") // move the cursor to the top left corner
+}
+
+def newLine(): Unit = {
+  println("\n")
 }

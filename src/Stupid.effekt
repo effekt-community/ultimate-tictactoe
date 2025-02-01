@@ -11,7 +11,7 @@ import src/Generate
 
 def playGame(): Unit = {
 
-  def chooseSide(): Player / {WrongInput} = {
+  def chooseSide(): Cell / {WrongInput} = {
     println("Choose the side[X, O]:")
     val side = consoleInput()
     side match {
@@ -62,14 +62,14 @@ def playGame(): Unit = {
     }
   }
 
-  def gameLoop(player: Player): Unit / {WrongInput} = {
+  def gameLoop(player: Cell): Unit / {WrongInput} = {
     var endGame: Bool = false
 
     var gameBoard: BigBoards = generateNewBigBoard()
     var currentSmallBoard: Int = 10
     var currentCell: Int = 10
 
-    var currentPlayer: Player = player
+    var currentPlayer: Cell = player
 
     printGameScreen(gameBoard, player)
 
@@ -141,7 +141,7 @@ def playGame(): Unit = {
   
   var play: Bool = true
 
-  var player: Player = Nought()
+  var player: Cell = Nought()
   while (play) {
 
     try{
@@ -162,12 +162,5 @@ def playGame(): Unit = {
 
 
 def main(): Unit = {
-  val cross: Player = Cross()
-  val nought: Player = Nought()
-  if (cross is nought) println("Yes!") else println("NO") // Yes!
-  if (Cross() is Nought()) println("Yes!") else println("NO") // NO
-  inspect(cross) // Cross()
-  inspect(nought) // Nought()
-  consoleInput()
   playGame()
 }

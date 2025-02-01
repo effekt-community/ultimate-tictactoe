@@ -64,12 +64,12 @@ def deactivateSmallBoard(bigBoards: BigBoards, number: Int): BigBoards = {
   BigBoards(newBigBoard, newBigBoardSmallCopy)
 }
 
-def checkNewCell(bigBoards: BigBoards, smallBoardNumber: Int, cellNumber: Int, player: Player): BigBoards = {
+def checkNewCell(bigBoards: BigBoards, smallBoardNumber: Int, cellNumber: Int, player: Cell): BigBoards = {
   with on[OutOfBounds].panic
 
   var newBigBoard: BigBoard = bigBoards.bigBoard
   var newSmallBoard: SmallBoard = newBigBoard.get(smallBoardNumber - 1)
-  newSmallBoard = newSmallBoard.replace(cellNumber - 1, Filled(player))
+  newSmallBoard = newSmallBoard.replace(cellNumber - 1, player)
   newBigBoard = newBigBoard.replace(smallBoardNumber - 1, newSmallBoard)
   BigBoards(newBigBoard, bigBoards.smallCopy)
 }
@@ -116,11 +116,11 @@ def checkAvailableCell(bigBoards: BigBoards, smallBoardNumber: Int, cellNumber: 
  * Input : SmallBoardNumber, player
  * Output : Boolean
  */
-def checkWinSituation(smallBoard: SmallBoard, player: Player): Bool = {
-  var cellType: Player = Cross()
-  if (player is Nought()) cellType = Nought()
+def checkWinSituation(smallBoard: SmallBoard, player: Cell): Bool = {
+  var cr: Bool = true
+  if (player is Cross()) cr = true else cr = false
   inspect(player)
-  inspect(cellType)
+  inspect(cr)
   consoleInput()
   var checkedCells: List[Int] = empty()
   var counter: Int = 0
@@ -128,14 +128,15 @@ def checkWinSituation(smallBoard: SmallBoard, player: Player): Bool = {
   
   smallBoard.foreach {cell =>
     cell match {
-      case Filled(cl) => cl match {
-        case cellType => checkedCells = checkedCells.insert(checkedCells.size(), counter)
-      }
+      case Cross() => if (cr) checkedCells = checkedCells.insert(checkedCells.size(), counter)
+      case Nought() => if (not(cr)) checkedCells = checkedCells.insert(checkedCells.size(), counter)
       case _ => ()
     }
     counter = counter + 1
   }
   counter = 0
+  inspect(checkedCells)
+  consoleInput()
   // Here we are checking if all three elements from the win combination are in the
   // Checked cells list
   winCombinations.foreach { combination =>
@@ -148,11 +149,11 @@ def checkWinSituation(smallBoard: SmallBoard, player: Player): Bool = {
   win
 }
 
-def fillWinningGameBoard(bigBoards: BigBoards, smallBoardNumber: Int, player: Player): BigBoards = {
+def fillWinningGameBoard(bigBoards: BigBoards, smallBoardNumber: Int, player: Cell): BigBoards = {
   var newBigBoard: BigBoard = bigBoards.bigBoard
   var newBigBoardSmallCopy: SmallBoard = bigBoards.smallCopy
 
-  newBigBoard = newBigBoard.replace(smallBoardNumber - 1, fill(9, Filled(player)))
-  newBigBoardSmallCopy = newBigBoardSmallCopy.replace(smallBoardNumber - 1, Filled(player))
+  newBigBoard = newBigBoard.replace(smallBoardNumber - 1, fill(9, player))
+  newBigBoardSmallCopy = newBigBoardSmallCopy.replace(smallBoardNumber - 1, player)
   BigBoards(newBigBoard, newBigBoardSmallCopy)
 }
