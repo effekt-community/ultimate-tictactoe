@@ -98,7 +98,8 @@ def playGame(): Unit = {
 
       // Check the winning situation
       with on[OutOfBounds].panic
-      if (checkWinSituation(gameBoard.bigBoard.get(currentSmallBoard - 1), player)){
+      if (checkWinSituation(gameBoard.bigBoard.get(currentSmallBoard - 1), currentPlayer)){
+        consoleInput()
         println("\nYou won the Small Board![Enter]")
         consoleInput()
         gameBoard = fillWinningGameBoard(gameBoard, currentSmallBoard, currentPlayer)
@@ -121,8 +122,8 @@ def playGame(): Unit = {
         gameBoard = newActiveSmallBoard(gameBoard, currentSmallBoard)
         currentCell = 10
       } else {
-        gameBoard = deactivateSmallBoard(gameBoard, currentCell)
-        // currentSmallBoard = 10
+        gameBoard = deactivateSmallBoard(gameBoard, currentSmallBoard)
+        currentSmallBoard = 10
       }
       ()
     }
@@ -161,5 +162,12 @@ def playGame(): Unit = {
 
 
 def main(): Unit = {
+  val cross: Player = Cross()
+  val nought: Player = Nought()
+  if (cross is nought) println("Yes!") else println("NO") // Yes!
+  if (Cross() is Nought()) println("Yes!") else println("NO") // NO
+  inspect(cross) // Cross()
+  inspect(nought) // Nought()
+  consoleInput()
   playGame()
 }

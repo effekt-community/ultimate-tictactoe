@@ -49,13 +49,6 @@ def deactivateSmallBoard(bigBoards: BigBoards, number: Int): BigBoards = {
   var newBigBoardSmallCopy: SmallBoard = bigBoards.smallCopy
   
   var newSmallBoard: SmallBoard = newBigBoard.get(number - 1)
-  // if(newSmallBoard.get(number - 1) is Filled(Player)){
-  //   println("Oh, fuck!")
-  //   do readLine()
-  //   ()
-  // }else {
-  //   newBigBoardSmallCopy = newBigBoardSmallCopy.replace(number - 1, Empty())
-  // }
   var counter: Int = 0
 
 
@@ -124,18 +117,26 @@ def checkAvailableCell(bigBoards: BigBoards, smallBoardNumber: Int, cellNumber: 
  * Output : Boolean
  */
 def checkWinSituation(smallBoard: SmallBoard, player: Player): Bool = {
+  var cellType: Player = Cross()
+  if (player is Nought()) cellType = Nought()
+  inspect(player)
+  inspect(cellType)
+  consoleInput()
   var checkedCells: List[Int] = empty()
   var counter: Int = 0
   var win: Bool = false
+  
   smallBoard.foreach {cell =>
     cell match {
-      case Filled(player) => checkedCells = checkedCells.insert(checkedCells.size(), counter)
+      case Filled(cl) => cl match {
+        case cellType => checkedCells = checkedCells.insert(checkedCells.size(), counter)
+      }
       case _ => ()
     }
     counter = counter + 1
   }
   counter = 0
-  // Here we are checking if all three elements from the win combination are in the 
+  // Here we are checking if all three elements from the win combination are in the
   // Checked cells list
   winCombinations.foreach { combination =>
     combination.foreach { el =>
