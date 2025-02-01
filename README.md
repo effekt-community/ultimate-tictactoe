@@ -1,127 +1,55 @@
-# Effekt Template
+# Ultimate Tic-Tac-Toe Game
 
-> [!WARNING]
-> This is a work-in-progress, feel free to contribute!
+An advanced version of the classic Tic-Tac-Toe game with a twist. The game consists of a 3x3 grid of Tic-Tac-Toe boards, where each move determines the board on which the opponent must play next.
 
-This template provides a starting point for Effekt projects.
+## Must-have
 
-## Table of contents
+- [x] A 3x3 grid of Tic-Tac-Toe boards.
+- [x] Standard Tic-Tac-Toe rules apply to each individual board.
+- [x] A move in one of the small boards determines the next board to play in.
+- [x] Win conditions for both individual boards and the overall game.
+- [x] A user-friendly terminal graphical interface.
+- [ ] Basic game Logic for single-player mode.
 
-- [First steps](#first-steps)
-- [Useful commands](#useful-commands)
-  - [Effekt commands](#effekt-commands)
-  - [Nix-related commands](#nix-related-commands)
-- [Example projects](#example-projects-using-this-template)
-- [Repository structure](#repository-structure)
-- [CI](#ci)
+## Can-have
 
----
+- [ ] Computer opponent logic with different difficulty levels.
+- [ ] Customizable themes and board designs.
+- [ ] Replay functionality to review past games.
 
-## First steps
+## Will-not-have
 
-After using this template, follow these steps to set up your project:
+- Integration with social media platforms.
+- In-game hints and move suggestions.
+- Complex animations or 3D graphics.
 
-1. Set up your development environment:
-   - Clone this repository locally.
-   - Open it in VSCode.
-   - Install the Effekt VSCode extension offered in the pop-up in the bottom right.
+## Effects and handlers
 
-2. Customize the project:
-   - Open `flake.nix` and update the project name and other relevant values (follow the comments).
-   - Push your `flake.nix` file after the changes and see if the CI agrees.
+- Event handlers for user interactions (e.g., making a move, restarting the game).
+- Effects for updating the UI based on game state changes.
 
-3. Set-up auto-update CI in order to get weekly PRs on Tuesday which update the Effekt version in CI:
-   - Go to Settings -> Actions -> General:
-     - and set "Workflow permissions" to "Read and write permissions"
-     - and check "Allow GitHub Actions to create and approve pull requests"    
-   - See the [CI](#ci) section for more details
+## FFI and libraries
 
-3. Replace this `README` with your own!
+- Terminal output library for rendering the game interface.
+- Current status: Researching suitable libraries and evaluating their integration complexity.
+- Official List library
+- Official String library.
+- Official Console library.
 
-## Useful commands
+## Running The Project
 
-### Effekt commands
+To run the project, you need to have Effekt installed on your machine. You can find instructions on how to install Effekt [here](https://effekt-lang.org/docs)
 
-Run the main file:
-```sh
-effekt src/main.effekt
-```
-This (like many other Effekt commands) uses the JavaScript backend by default.
-To use a different backend, add the `--backend <backend>` flag.
+After installing Effekt, you can run the project by executing the following command in the project's root directory:
 
-Run the tests:
-```sh
-effekt src/test.effekt
+```bash
+effekt src/Stupid.effekt --backend js --includes .
 ```
 
-Open the REPL:
-```sh
-effekt
-```
+This will then produce a `main.html` and `main.js` file in the `out` directory. You can open the `main.html` file in your browser to run the emulator.
 
-Build the project:
-```sh
-effekt --build src/main.effekt
-```
-This builds the project into the `out/` directory, creating a runnable file `out/main`.
+Chip-8 ROMs can be found online and loaded into the emulator by clicking the "Load ROM" button in the GUI.
 
-To see all available options and backends, run:
-```sh
-effekt --help
-```
+## Resources
 
-### Nix-related commands
-
-While Nix installation is optional, it provides several benefits:
-
-Update dependencies (also runs automatically in CI):
-```sh
-nix flake update
-```
-
-Open a shell with all necessary dependencies:
-```sh
-nix develop
-```
-
-Run the main entry point:
-```sh
-nix run
-```
-
-Build the project (output in `result/bin/`):
-```sh
-nix build
-```
-
-## Example projects using this template
-
-- [`effekt-stm`](https://github.com/jiribenes/effekt-stm)
-- This very project!
-
-## Repository structure
-
-- `.github/workflows/*.yml`: Contains the [CI](#ci) definitions
-- `src/`: Contains the source code
-  - `main.effekt`: Main entry point
-  - `test.effekt`: Entry point for tests
-  - `lib.effekt`: Library code imported by `main` and `test`
-- `flake.nix`: Package configuration in a Nix flake
-- `flake.lock`: Auto-generated lockfile for dependencies
-- `LICENSE`: Project license
-- `README`: This README file
-
-## CI
-
-Two GitHub Actions are set up:
-
-1. `flake-check`:
-   - Checks the `flake.nix` file, builds and tests the project
-   - Runs on demand, on `main`, and on PRs
-   - To run custom commands, add a step using:
-     - `nix run -- <ARGS>` to run the main entry point with the given arguments
-     - `nix develop -c '<bash command to run>'` to run commands in the correct environment
-
-2. `update-flake-lock`:
-   - Updates package versions in `flake.nix`
-   - Runs on demand and weekly (Tuesdays at 00:00 UTC)
+- [Ultimate Tic-Tac-Toe reference](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
