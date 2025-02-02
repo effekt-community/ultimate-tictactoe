@@ -49,9 +49,9 @@ def playGame(): Unit = {
     }
     else {
       with on[WrongFormat].panic
-      val smallBoardNumber: Int = toInt(smallBoardNumber)
-      if (checkAvailableCell(gameBoard.smallCopy, smallBoardNumber - 1)){
-        smallBoardNumber - 1
+      val smallBoardNumber: Int = toInt(smallBoardNumber) - 1
+      if (checkAvailableCell(gameBoard.smallCopy, smallBoardNumber)){
+        smallBoardNumber
       }else {
         do WrongInput("This Small Board is Already occupied. Please type a number for a valid Small Board.")
         chooseSmallBoard(gameBoard)
@@ -70,10 +70,10 @@ def playGame(): Unit = {
       chooseCell(gameBoard, smallBoardNumber)
     }else {
       with on[WrongFormat].panic
-      val cellNumberInt = toInt(cellNumber)
+      val cellNumberInt = toInt(cellNumber) - 1
 
-      if(checkAvailableCell(gameBoard.bigBoard.get(smallBoardNumber), cellNumberInt - 1)){
-        cellNumberInt - 1
+      if(checkAvailableCell(gameBoard.bigBoard.get(smallBoardNumber), cellNumberInt)){
+        cellNumberInt
       }else{
         do WrongInput("This Cell is Already occupied. Please type a number for a valid cell.")
         chooseCell(gameBoard, smallBoardNumber)
@@ -95,39 +95,48 @@ def playGame(): Unit = {
 
     printGameScreen(gameBoard, player)
 
-    if (player is Cross()) {
-      println("You're starting the game!\nChoose the starting Small Board.")
-      currentSmallBoard = chooseSmallBoard(gameBoard)
-      gameBoard = newActiveSmallBoard(gameBoard, currentSmallBoard)
-    } else {
-      println("Opponent is starting the game!\n")
-      if (gameMode is Computer()){
-        currentSmallBoard = computerPlay(gameBoard.smallCopy, computer)
-        gameBoard = newActiveSmallBoard(gameBoard, currentSmallBoard)
-      }else{
-        currentSmallBoard = chooseSmallBoard(gameBoard)
-        gameBoard = newActiveSmallBoard(gameBoard, currentSmallBoard)
-      }
-    }
+    // if (player is Cross()) {
+    //   println("You're starting the game!\nChoose the starting Small Board.")
+    //   currentSmallBoard = chooseSmallBoard(gameBoard)
+    //   gameBoard = newActiveSmallBoard(gameBoard, currentSmallBoard)
+    // } else {
+    //   println("Opponent is starting the game!\n")
+    //   if (gameMode is Computer()){
+    //     currentSmallBoard = computerPlay(gameBoard.smallCopy, computer)
+    //     gameBoard = newActiveSmallBoard(gameBoard, currentSmallBoard)
+    //   }else{
+    //     currentSmallBoard = chooseSmallBoard(gameBoard)
+    //     gameBoard = newActiveSmallBoard(gameBoard, currentSmallBoard)
+    //   }
+    // }
+    println("You're starting the game!\nChoose the starting Small Board.")
+    currentSmallBoard = chooseSmallBoard(gameBoard)
+    gameBoard = newActiveSmallBoard(gameBoard, currentSmallBoard)
 
     // INNER GAME LOOP OF ONE GAME
     while (not(endGame)){
-      with on[OutOfBounds].panic
+      
       
       // Choose the new Small Board
       if (currentSmallBoard == 10) {
-        if (gameMode is Computer()) if (isComputerTurn(currentPlayer, computer)) currentSmallBoard = computerPlay(gameBoard.smallCopy, computer)
-        else currentSmallBoard = chooseSmallBoard(gameBoard)
+        if (gameMode is Computer()) {
+          if (isComputerTurn(currentPlayer, computer)) currentSmallBoard = computerPlay(gameBoard.smallCopy, computer)
+          else currentSmallBoard = chooseSmallBoard(gameBoard)
+        }else currentSmallBoard = chooseSmallBoard(gameBoard)
         gameBoard = newActiveSmallBoard(gameBoard, currentSmallBoard)
       }
 
       // The Move Phase
       printGameScreen(gameBoard, currentPlayer)
-      if(gameMode is Computer()) if (isComputerTurn(currentPlayer, computer)) currentCell = computerPlay(gameBoard.bigBoard.get(currentSmallBoard), computer) 
-      else currentCell = chooseCell(gameBoard, currentSmallBoard)
+      if (gameMode is Computer()) {
+        with on[OutOfBounds].panic
+        if (isComputerTurn(currentPlayer, computer)) currentCell = computerPlay(gameBoard.bigBoard.get(currentSmallBoard), computer)
+        else currentCell = chooseCell(gameBoard, currentSmallBoard)
+      }else currentCell = chooseCell(gameBoard, currentSmallBoard)
 
       gameBoard = checkNewCell(gameBoard, currentSmallBoard, currentCell, currentPlayer)
-      checkWinSituation(gameBoard.bigBoard.get(currentSmallBoard - 1), currentPlayer) match {
+      with on[OutOfBounds].panic
+      checkWinSituation(gameBoard.bigBoard.get(currentSmallBoard), currentPlayer) match {
         case Win() => {
           println("\nYou won the Small Board!")
           consoleInput()
