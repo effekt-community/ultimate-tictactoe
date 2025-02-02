@@ -13,7 +13,7 @@ def playGame(): Unit = {
 
   // Returns the chosen Game Mode
   def chooseGameMode(): GameMode / {WrongInput} = {
-    println("Choose the Game Mode:\n[1 - 2 Players, 2 - vs Computer]:")
+    println("Choose the Game Mode:\n[1 - Local, 2 - vs Computer]:")
     val side = consoleInput()
     side match {
       case "1" => Local()
@@ -100,7 +100,7 @@ def playGame(): Unit = {
       currentSmallBoard = chooseSmallBoard(gameBoard)
       gameBoard = newActiveSmallBoard(gameBoard, currentSmallBoard)
     } else {
-      println("Opponent is starting the game!\nChoose the starting Small Board.")
+      println("Opponent is starting the game!\n")
       if (gameMode is Computer()){
         currentSmallBoard = computerPlay(gameBoard.smallCopy, computer)
         gameBoard = newActiveSmallBoard(gameBoard, currentSmallBoard)
@@ -112,23 +112,21 @@ def playGame(): Unit = {
 
     // INNER GAME LOOP OF ONE GAME
     while (not(endGame)){
+      with on[OutOfBounds].panic
+      
+      // Choose the new Small Board
       if (currentSmallBoard == 10) {
-        if (isComputerTurn(currentPlayer, computer)){
-          currentSmallBoard = computerPlay(gameBoard.smallCopy, computer)
-          gameBoard = newActiveSmallBoard(gameBoard, currentSmallBoard)
-        }
-        printGameScreen(gameBoard, currentPlayer)
-        currentSmallBoard = chooseSmallBoard(gameBoard)
+        if (gameMode is Computer()) if (isComputerTurn(currentPlayer, computer)) currentSmallBoard = computerPlay(gameBoard.smallCopy, computer)
+        else currentSmallBoard = chooseSmallBoard(gameBoard)
         gameBoard = newActiveSmallBoard(gameBoard, currentSmallBoard)
       }
 
-      // Before The Player's Move
+      // The Move Phase
       printGameScreen(gameBoard, currentPlayer)
-      currentCell = chooseCell(gameBoard, currentSmallBoard)
-      gameBoard = checkNewCell(gameBoard, currentSmallBoard, currentCell, currentPlayer)
+      if(gameMode is Computer()) if (isComputerTurn(currentPlayer, computer)) currentCell = computerPlay(gameBoard.bigBoard.get(currentSmallBoard), computer) 
+      else currentCell = chooseCell(gameBoard, currentSmallBoard)
 
-      // Check the winning situation
-      with on[OutOfBounds].panic
+      gameBoard = checkNewCell(gameBoard, currentSmallBoard, currentCell, currentPlayer)
       checkWinSituation(gameBoard.bigBoard.get(currentSmallBoard - 1), currentPlayer) match {
         case Win() => {
           println("\nYou won the Small Board!")
@@ -146,7 +144,6 @@ def playGame(): Unit = {
       // After The Player's Move
       printGameScreen(gameBoard, currentPlayer)
       println("Excellent Move! Now Press the Enter to finish your turn.")
-
       consoleInput()
 
       // Change the Current Small Board
@@ -154,11 +151,11 @@ def playGame(): Unit = {
         gameBoard = deactivateSmallBoard(gameBoard, currentSmallBoard)
         currentSmallBoard = currentCell
         gameBoard = newActiveSmallBoard(gameBoard, currentSmallBoard)
-        currentCell = 10
       } else {
         gameBoard = deactivateSmallBoard(gameBoard, currentSmallBoard)
         currentSmallBoard = 10
       }
+      currentCell = 10
 
       // Verify if the game has been won
       if (checkWinSituation(gameBoard.smallCopy, currentPlayer) is Win()){
@@ -218,7 +215,6 @@ def playGame(): Unit = {
       println(msg)
       resume(())
     }
-    ()
   }
   println("Goodbye!")
 }

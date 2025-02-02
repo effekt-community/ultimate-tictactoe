@@ -152,6 +152,8 @@ def fillWinningGameBoard(gameBoard: BigBoards, smallBoardNumber: Int, player: Ce
 }
 
 def computerPlay(smallBoard: SmallBoard, computer: Cell): Int = {
+  println("It's computer playing. Please press Enter")
+  consoleInput()
   with on[OutOfBounds].panic
 
   var newSmallBoard: SmallBoard = smallBoard
@@ -214,7 +216,7 @@ def isComputerTurn(currentPlayer: Cell, computer: Cell): Bool = {
   var pcCross: Bool = false
   var returnValue: Bool = false
   if (computer is Cross()) pcCross = true
-  if (currentPlayer is Cross()) if (pcCross) returnValue = true
-  if (currentPlayer is Nought()) if (not(pcCross)) returnValue = true
-  false
+  if (currentPlayer is Cross() and pcCross) returnValue = true
+  if (currentPlayer is Nought() and not(pcCross)) returnValue = true
+  returnValue
 }
