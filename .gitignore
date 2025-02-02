@@ -4,3 +4,4 @@ out
 # Nix
 result
 result-*
+.DS_STORE

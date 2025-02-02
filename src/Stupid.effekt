@@ -38,7 +38,7 @@ def playGame(): Unit = {
 
 
   // Returns the Small Board Number [0 - 8]
-  def chooseSmallBoard(gameBoard: BigBoards): Int / {WrongInput} = {
+  def chooseSmallBoard(gameBoard: GameBoard): Int / {WrongInput} = {
     println("Choose the Small Board[1 - 9]:")
     val smallBoardNumber: String = consoleInput()
 
@@ -59,7 +59,7 @@ def playGame(): Unit = {
   }
 
   // Returns the chosen Cell inside the board [0 - 8]
-  def chooseCell(gameBoard: BigBoards, smallBoardNumber: Int): Int / {WrongInput} = {
+  def chooseCell(gameBoard: GameBoard, smallBoardNumber: Int): Int / {WrongInput} = {
     with on[OutOfBounds].panic
 
     println("Choose the cell inside your Small Board")
@@ -84,7 +84,7 @@ def playGame(): Unit = {
   def gameLoop(player: Cell, gameMode: GameMode): Unit / {WrongInput} = {
     var endGame: Bool = false
 
-    var gameBoard: BigBoards = generateNewBigBoard()
+    var gameBoard: GameBoard = generateNewBigBoard()
     var currentSmallBoard: Int = 10
     var currentCell: Int = 10
     

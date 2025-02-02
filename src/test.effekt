@@ -2,9 +2,186 @@ module src/test
 
 import test
 import src/lib
+import src/Generate
 
-def main() = mainSuite("lib") {
+def main() = mainSuite("main") {
+  with on[OutOfBounds].panic
+
+  def createWinBoard(combination: List[Int], player: Cell): SmallBoard = {
+    var board: SmallBoard = fill(9, Empty())
+    combination.foreach { index => board = board.replace(index, player) }
+    board
+  }
+
   test("Hello world") {
     assertEqual(helloWorld(), "Hello, world!")
+  }
+  test("Player String for Cross") {
+    assertEqual(playerString(Cross()), "X")
+  }
+  test("Player String for Nought") {
+    assertEqual(playerString(Nought()), "O")
+  }
+  test("generateNewBigBoard creates BigBoard with 9 SmallBoards") {
+    val newGame: GameBoard = generateNewBigBoard()
+    assertEqual(newGame.bigBoard.size(), 9)
+  }
+  test("generateNewBigBoard initializes SmallBoards with Empty cells") {
+    val newGame: GameBoard = generateNewBigBoard()
+    newGame.bigBoard.foreach { smallBoard =>
+      smallBoard.foreach { cell =>
+        assertEqual(cell, Empty())
+      }
+      assertEqual(smallBoard.size(), 9)
+    }
+  }
+  test("generateNewBigBoard initializes smallCopy with Empty cells") {
+    val newGame = generateNewBigBoard()
+    newGame.smallCopy.foreach { cell =>
+      assertEqual(cell, Empty())
+    }
+    assertEqual(newGame.smallCopy.size(), 9)
+  }
+
+  test("newActiveSmallBoard activates small board 0 and updates smallCopy") {
+    var game = generateNewBigBoard()
+    game = newActiveSmallBoard(game, 0)
+
+    assertEqual(game.smallCopy.get(0), Active()) // Check smallCopy update
+
+    val smallBoard0 = game.bigBoard.get(0)
+    smallBoard0.foreach { cell =>
+      assertEqual(cell, Active()) // Check if all cells in smallBoard0 are Active
+    }
+  }
+
+  test("newActiveSmallBoard activates small board 5 and updates smallCopy") {
+    var game = generateNewBigBoard()
+    game = newActiveSmallBoard(game, 5)
+
+    assertEqual(game.smallCopy.get(5), Active()) // Check smallCopy update
+
+    val smallBoard5 = game.bigBoard.get(5)
+    smallBoard5.foreach { cell =>
+      assertEqual(cell, Active()) // Check if all cells in smallBoard5 are Active
+    }
+  }
+  
+  test("deactivateSmallBoard deactivates small board 0"){
+    var game = generateNewBigBoard()
+    game = newActiveSmallBoard(game, 0) // First activate it
+    game = deactivateSmallBoard(game, 0) // Then deactivate
+
+    val smallBoard0 = game.bigBoard.get(0)
+    smallBoard0.foreach { cell =>
+      assertEqual(cell, Empty()) // Check if all cells in smallBoard0 are Empty again
+    }
+    // You might want to assert something about smallCopy here depending on desired behavior
+    // For example, if smallCopy should also be reset:
+    assertEqual(game.smallCopy.get(0), Empty())
+  }
+
+  test("checkNewCell places Cross in cell 0 of small board 0") {
+    var game = generateNewBigBoard()
+    game = checkNewCell(game, 0, 0, Cross())
+    assertEqual(game.bigBoard.get(0).get(0), Cross())
+  }
+
+  test("checkNewCell places Nought in cell 5 of small board 3") {
+    var game = generateNewBigBoard()
+    game = generateNewBigBoard()
+    game = checkNewCell(game, 3, 5, Nought())
+    assertEqual(game.bigBoard.get(3).get(5), Nought())
+  }
+
+  test("checkAvailableCell returns true for Empty cell") {
+    val smallBoard: SmallBoard = fill(9, Empty())
+    assertEqual(checkAvailableCell(smallBoard, 2), true)
+  }
+
+  test("checkAvailableCell returns true for Active cell") {
+    val smallBoard: SmallBoard = fill(9, Empty()).replace(4, Active())
+    assertEqual(checkAvailableCell(smallBoard, 4), true)
+  }
+
+  test("checkAvailableCell returns false for Cross cell") {
+    val smallBoard: SmallBoard = fill(9, Empty()).replace(7, Cross())
+    assertEqual(checkAvailableCell(smallBoard, 7), false)
+  }
+
+  test("checkAvailableCell returns false for Nought cell") {
+    val smallBoard: SmallBoard = fill(9, Empty()).replace(1, Nought())
+    assertEqual(checkAvailableCell(smallBoard, 1), false)
+  }
+  test("Winning Combinations"){
+    winCombinations.take(3).foreach { combination => // First 3 are rows
+        val winBoard = createWinBoard(combination, Cross())
+        assertEqual(checkWinSituation(winBoard, Cross()), Win())
+      }
+  }
+  test("Draw (Loose)") {
+    var drawBoard: SmallBoard = empty()
+    [Cross(), Nought(), Cross(), Nought(), Cross(), Cross(), Nought(), Cross(), Nought()].foreach { player =>
+      drawBoard = drawBoard.insert(drawBoard.size(), player)
+    }
+    assertEqual(checkWinSituation(drawBoard, Cross()), Loose())
+  }
+
+  test("No Win Yet") {
+    val noWinBoard: SmallBoard = [Cross(), Empty(), Nought(), Empty(), Cross(), Empty(), Empty(), Empty(), Nought()]
+    assertEqual(checkWinSituation(noWinBoard, Cross()), Nope())
+  }
+
+  test("fillWinningGameBoard fills with Cross") {
+    var game = generateNewBigBoard()
+    game = fillWinningGameBoard(game, 2, Cross())
+    val smallBoard2 = game.bigBoard.get(2)
+    smallBoard2.foreach { cell => assertEqual(cell, Cross()) }
+    assertEqual(game.smallCopy.get(2), Cross())
+  }
+
+  test("fillWinningGameBoard fills with Nought") {
+    var game = generateNewBigBoard()
+    game = fillWinningGameBoard(game, 7, Nought())
+    val smallBoard7 = game.bigBoard.get(7)
+    smallBoard7.foreach { cell => assertEqual(cell, Nought()) }
+    assertEqual(game.smallCopy.get(7), Nought())
+  }
+
+  test("fillWinningGameBoard fills with Draw") {
+    var game = generateNewBigBoard()
+    game = fillWinningGameBoard(game, 4, Draw())
+    val smallBoard4 = game.bigBoard.get(4)
+    smallBoard4.foreach { cell => assertEqual(cell, Draw()) }
+    assertEqual(game.smallCopy.get(4), Draw())
+  }
+
+  test("Computer Cross, Player Cross - Computer's turn") {
+    assertEqual(isComputerTurn(Cross(), Cross()), true)
+  }
+
+  test("Computer Cross, Player Nought - Not computer's turn") {
+    assertEqual(isComputerTurn(Nought(), Cross()), false)
+  }
+  test("Computer Nought, Player Nought - Computer's turn") {
+    assertEqual(isComputerTurn(Nought(), Nought()), true)
+  }
+  test("Computer Nought, Player Cross - Not computer's turn") {
+    assertEqual(isComputerTurn(Cross(), Nought()), false)
+  }
+
+  test("computerPlay returns valid cell on empty board") {
+    val emptyBoard: SmallBoard = fill(9, Empty())
+    val resultCell = computerPlay(emptyBoard, Cross())
+    assertEqual(resultCell >= 0, resultCell <= 8)
+  }
+
+  test("computerPlay returns valid cell on almost full board") {
+    var almostFullBoard: SmallBoard = empty()
+    [Cross(), Nought(), Cross(), Nought(), Cross(), Nought(), Nought(), Cross(), Empty()].foreach { player =>
+      almostFullBoard = almostFullBoard.insert(almostFullBoard.size(), player)
+    }
+    val resultCell = computerPlay(almostFullBoard, Nought())
+    assertEqual(resultCell >= 0, resultCell <= 8)
   }
 }

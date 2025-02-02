@@ -77,11 +77,11 @@ def createUnifiedRow(boardRow: List[SmallBoard]): List[Cell] = {
   resultRow
 }
 
-def printGameScreen(bigBoards: BigBoards, player: Cell): Unit = {
+def printGameScreen(gameBoard: GameBoard, player: Cell): Unit = {
   clearScreen()
   println("You're playing as " ++ playerString(player))
   newLine()
   
-  renderBoard(bigBoards.bigBoard)
+  renderBoard(gameBoard.bigBoard)
   newLine()
 }

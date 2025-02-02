@@ -8,17 +8,17 @@ import src/lib
 /**
  * Generates a new BigBoard
  * Input : None
- * Output : BigBoards
+ * Output : GameBoard
  */
-def generateNewBigBoard(): BigBoards = {
+def generateNewBigBoard(): GameBoard = {
   val smallBoard: SmallBoard = fill(9, Empty())
   val bigBoard: BigBoard = fill(9, smallBoard)
-  BigBoards(bigBoard, smallBoard)
+  GameBoard(bigBoard, smallBoard)
 }
 
 
 // Makes a new Small Board Active()
-def newActiveSmallBoard(gameBoard: BigBoards, smallBoardNumber: Int): BigBoards = {
+def newActiveSmallBoard(gameBoard: GameBoard, smallBoardNumber: Int): GameBoard = {
   with on[OutOfBounds].panic
 
   var newBigBoard: BigBoard = gameBoard.bigBoard
@@ -41,10 +41,10 @@ def newActiveSmallBoard(gameBoard: BigBoards, smallBoardNumber: Int): BigBoards 
   }
 
   newBigBoard = newBigBoard.replace(smallBoardNumber, newSmallBoard)
-  BigBoards(newBigBoard, newGameBoardSmallCopy)
+  GameBoard(newBigBoard, newGameBoardSmallCopy)
 }
 
-def deactivateSmallBoard(gameBoard: BigBoards, smallBoardNumber: Int): BigBoards = {
+def deactivateSmallBoard(gameBoard: GameBoard, smallBoardNumber: Int): GameBoard = {
   with on[OutOfBounds].panic
 
   var newBigBoard: BigBoard = gameBoard.bigBoard
@@ -52,7 +52,7 @@ def deactivateSmallBoard(gameBoard: BigBoards, smallBoardNumber: Int): BigBoards
   
   var newSmallBoard: SmallBoard = newBigBoard.get(smallBoardNumber)
   var counter: Int = 0
-
+  newGameBoardSmallCopy = newGameBoardSmallCopy.replace(smallBoardNumber, Empty())
 
   newSmallBoard.foreach {cell =>
     cell match {
@@ -63,23 +63,23 @@ def deactivateSmallBoard(gameBoard: BigBoards, smallBoardNumber: Int): BigBoards
     ()
   }
   newBigBoard = newBigBoard.replace(smallBoardNumber, newSmallBoard)
-  BigBoards(newBigBoard, newGameBoardSmallCopy)
+  GameBoard(newBigBoard, newGameBoardSmallCopy)
 }
 
-def checkNewCell(gameBoard: BigBoards, smallBoardNumber: Int, cellNumber: Int, player: Cell): BigBoards = {
+def checkNewCell(gameBoard: GameBoard, smallBoardNumber: Int, cellNumber: Int, player: Cell): GameBoard = {
   with on[OutOfBounds].panic
 
   var newBigBoard: BigBoard = gameBoard.bigBoard
   var newSmallBoard: SmallBoard = newBigBoard.get(smallBoardNumber)
   newSmallBoard = newSmallBoard.replace(cellNumber, player)
   newBigBoard = newBigBoard.replace(smallBoardNumber, newSmallBoard)
-  BigBoards(newBigBoard, gameBoard.smallCopy)
+  GameBoard(newBigBoard, gameBoard.smallCopy)
 }
 
 /*
  * Returns true if the cell is  free.
  * False Otherwise
- * Input : BigBoards, SmallBoardNumber, Cell Number
+ * Input : GameBoard, SmallBoardNumber, Cell Number
  * Output : Boolean
  */
 def checkAvailableCell(smallBoard: SmallBoard, cellNumber: Int): Bool = {
@@ -142,19 +142,18 @@ def checkWinSituation(smallBoard: SmallBoard, player: Cell): WinBoard = {
   win
 }
 
-def fillWinningGameBoard(gameBoard: BigBoards, smallBoardNumber: Int, player: Cell): BigBoards = {
+def fillWinningGameBoard(gameBoard: GameBoard, smallBoardNumber: Int, player: Cell): GameBoard = {
   var newBigBoard: BigBoard = gameBoard.bigBoard
   var newGameBoardSmallCopy: SmallBoard = gameBoard.smallCopy
 
   newBigBoard = newBigBoard.replace(smallBoardNumber, fill(9, player))
   newGameBoardSmallCopy = newGameBoardSmallCopy.replace(smallBoardNumber, player)
-  BigBoards(newBigBoard, newGameBoardSmallCopy)
+  GameBoard(newBigBoard, newGameBoardSmallCopy)
 }
 
 def computerPlay(smallBoard: SmallBoard, computer: Cell): Int = {
-  println("It's computer playing. Please press Enter")
-  consoleInput()
   with on[OutOfBounds].panic
+  println("It's computer playing.")
 
   var newSmallBoard: SmallBoard = smallBoard
   var player: Cell = Cross()
