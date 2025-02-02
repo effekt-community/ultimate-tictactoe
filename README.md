@@ -9,11 +9,11 @@ An advanced version of the classic Tic-Tac-Toe game with a twist. The game consi
 - [x] A move in one of the small boards determines the next board to play in.
 - [x] Win conditions for both individual boards and the overall game.
 - [x] A user-friendly terminal graphical interface.
-- [ ] Basic game Logic for single-player mode.
+- [x] Basic game Logic for a single-player mode.
 
 ## Can-have
 
-- [ ] Computer opponent logic with different difficulty levels.
+- [x] Computer opponent logic with different difficulty levels.
 - [ ] Customizable themes and board designs.
 - [ ] Replay functionality to review past games.
 
@@ -45,10 +45,6 @@ After installing Effekt, you can run the project by executing the following comm
 ```bash
 effekt src/Stupid.effekt --backend js --includes .
 ```
-
-This will then produce a `main.html` and `main.js` file in the `out` directory. You can open the `main.html` file in your browser to run the emulator.
-
-Chip-8 ROMs can be found online and loaded into the emulator by clicking the "Load ROM" button in the GUI.
 
 ## Resources
 
