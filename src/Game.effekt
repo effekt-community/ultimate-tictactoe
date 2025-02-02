@@ -1,4 +1,4 @@
-module src/Stupid
+module src/Game
 
 import tty
 import io/console

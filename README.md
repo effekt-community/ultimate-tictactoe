@@ -43,7 +43,7 @@ To run the project, you need to have Effekt installed on your machine. You can f
 After installing Effekt, you can run the project by executing the following command in the project's root directory:
 
 ```bash
-effekt src/Stupid.effekt --backend js --includes .
+effekt src/main.effekt --backend js --includes .
 ```
 
 ## Resources

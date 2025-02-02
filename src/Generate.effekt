@@ -52,7 +52,7 @@ def deactivateSmallBoard(gameBoard: GameBoard, smallBoardNumber: Int): GameBoard
   
   var newSmallBoard: SmallBoard = newBigBoard.get(smallBoardNumber)
   var counter: Int = 0
-  newGameBoardSmallCopy = newGameBoardSmallCopy.replace(smallBoardNumber, Empty())
+  // newGameBoardSmallCopy = newGameBoardSmallCopy.replace(smallBoardNumber, Empty())
 
   newSmallBoard.foreach {cell =>
     cell match {
