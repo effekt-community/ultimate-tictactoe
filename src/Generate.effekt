@@ -16,16 +16,18 @@ def generateNewBigBoard(): BigBoards = {
   BigBoards(bigBoard, smallBoard)
 }
 
-def newActiveSmallBoard(bigBoards: BigBoards, number: Int): BigBoards = {
+
+// Makes a new Small Board Active()
+def newActiveSmallBoard(gameBoard: BigBoards, smallBoardNumber: Int): BigBoards = {
   with on[OutOfBounds].panic
 
-  var newBigBoard: BigBoard = bigBoards.bigBoard
-  var newBigBoardSmallCopy: SmallBoard = bigBoards.smallCopy
-  var newSmallBoard: SmallBoard = newBigBoard.get(number - 1)
+  var newBigBoard: BigBoard = gameBoard.bigBoard
+  var newGameBoardSmallCopy: SmallBoard = gameBoard.smallCopy
+  var newSmallBoard: SmallBoard = newBigBoard.get(smallBoardNumber )
 
 
   // Making Active Cell in the Small Copy of the Big Board
-  newBigBoardSmallCopy = newBigBoardSmallCopy.replace(number - 1, Active())
+  newGameBoardSmallCopy = newGameBoardSmallCopy.replace(smallBoardNumber, Active())
   
   // Replacing all the Empty() cells with Active()
   var counter: Int = 0
@@ -38,17 +40,17 @@ def newActiveSmallBoard(bigBoards: BigBoards, number: Int): BigBoards = {
     ()
   }
 
-  newBigBoard = newBigBoard.replace(number - 1, newSmallBoard)
-  BigBoards(newBigBoard, newBigBoardSmallCopy)
+  newBigBoard = newBigBoard.replace(smallBoardNumber, newSmallBoard)
+  BigBoards(newBigBoard, newGameBoardSmallCopy)
 }
 
-def deactivateSmallBoard(bigBoards: BigBoards, number: Int): BigBoards = {
+def deactivateSmallBoard(gameBoard: BigBoards, smallBoardNumber: Int): BigBoards = {
   with on[OutOfBounds].panic
 
-  var newBigBoard: BigBoard = bigBoards.bigBoard
-  var newBigBoardSmallCopy: SmallBoard = bigBoards.smallCopy
+  var newBigBoard: BigBoard = gameBoard.bigBoard
+  var newGameBoardSmallCopy: SmallBoard = gameBoard.smallCopy
   
-  var newSmallBoard: SmallBoard = newBigBoard.get(number - 1)
+  var newSmallBoard: SmallBoard = newBigBoard.get(smallBoardNumber)
   var counter: Int = 0
 
 
@@ -60,39 +62,19 @@ def deactivateSmallBoard(bigBoards: BigBoards, number: Int): BigBoards = {
     counter = counter + 1
     ()
   }
-  newBigBoard = newBigBoard.replace(number - 1, newSmallBoard)
-  BigBoards(newBigBoard, newBigBoardSmallCopy)
+  newBigBoard = newBigBoard.replace(smallBoardNumber, newSmallBoard)
+  BigBoards(newBigBoard, newGameBoardSmallCopy)
 }
 
-def checkNewCell(bigBoards: BigBoards, smallBoardNumber: Int, cellNumber: Int, player: Cell): BigBoards = {
+def checkNewCell(gameBoard: BigBoards, smallBoardNumber: Int, cellNumber: Int, player: Cell): BigBoards = {
   with on[OutOfBounds].panic
 
-  var newBigBoard: BigBoard = bigBoards.bigBoard
-  var newSmallBoard: SmallBoard = newBigBoard.get(smallBoardNumber - 1)
-  newSmallBoard = newSmallBoard.replace(cellNumber - 1, player)
-  newBigBoard = newBigBoard.replace(smallBoardNumber - 1, newSmallBoard)
-  BigBoards(newBigBoard, bigBoards.smallCopy)
+  var newBigBoard: BigBoard = gameBoard.bigBoard
+  var newSmallBoard: SmallBoard = newBigBoard.get(smallBoardNumber)
+  newSmallBoard = newSmallBoard.replace(cellNumber, player)
+  newBigBoard = newBigBoard.replace(smallBoardNumber, newSmallBoard)
+  BigBoards(newBigBoard, gameBoard.smallCopy)
 }
-
-/*
- * Returns true if the Small Board is  free.
- * False Otherwise
- * Input : BigBoards, SmallBoardNumber, Cell Number
- * Output : Boolean
- */
-def checkAvailableSmallBoard(bigBoards: BigBoards, cellNumber: Int): Bool = {
-  with console
-  with on[OutOfBounds].panic
-
-  val cellType: Cell = bigBoards.smallCopy.get(cellNumber - 1)
-
-  cellType match {
-    case Empty() => true
-    case Active() => true
-    case _ => false
-  }
-}
-
 
 /*
  * Returns true if the cell is  free.
@@ -100,14 +82,15 @@ def checkAvailableSmallBoard(bigBoards: BigBoards, cellNumber: Int): Bool = {
  * Input : BigBoards, SmallBoardNumber, Cell Number
  * Output : Boolean
  */
-def checkAvailableCell(bigBoards: BigBoards, smallBoardNumber: Int, cellNumber: Int): Bool = {
+def checkAvailableCell(smallBoard: SmallBoard, cellNumber: Int): Bool = {
   with on[OutOfBounds].panic
 
-  var newBigBoard: BigBoard = bigBoards.bigBoard
-  var newSmallBoard: SmallBoard = newBigBoard.get(smallBoardNumber - 1)
-  val cellType: Cell = newSmallBoard.get(cellNumber - 1)
-  if (cellType is Active()) true
-  else false
+  val cellType: Cell = smallBoard.get(cellNumber)
+    cellType match {
+    case Empty() => true
+    case Active() => true
+    case _ => false
+  }
 }
 
 /*
@@ -159,11 +142,81 @@ def checkWinSituation(smallBoard: SmallBoard, player: Cell): WinBoard = {
   win
 }
 
-def fillWinningGameBoard(bigBoards: BigBoards, smallBoardNumber: Int, player: Cell): BigBoards = {
-  var newBigBoard: BigBoard = bigBoards.bigBoard
-  var newBigBoardSmallCopy: SmallBoard = bigBoards.smallCopy
+def fillWinningGameBoard(gameBoard: BigBoards, smallBoardNumber: Int, player: Cell): BigBoards = {
+  var newBigBoard: BigBoard = gameBoard.bigBoard
+  var newGameBoardSmallCopy: SmallBoard = gameBoard.smallCopy
 
-  newBigBoard = newBigBoard.replace(smallBoardNumber - 1, fill(9, player))
-  newBigBoardSmallCopy = newBigBoardSmallCopy.replace(smallBoardNumber - 1, player)
-  BigBoards(newBigBoard, newBigBoardSmallCopy)
+  newBigBoard = newBigBoard.replace(smallBoardNumber, fill(9, player))
+  newGameBoardSmallCopy = newGameBoardSmallCopy.replace(smallBoardNumber, player)
+  BigBoards(newBigBoard, newGameBoardSmallCopy)
+}
+
+def computerPlay(smallBoard: SmallBoard, computer: Cell): Int = {
+  println("It's computer playing. Please press Enter")
+  consoleInput()
+  with on[OutOfBounds].panic
+
+  var newSmallBoard: SmallBoard = smallBoard
+  var player: Cell = Cross()
+  if (computer is Cross()) player = Nought()
+  var counter: Int = 0
+  var resultCell: Int = 10
+
+  // Check for a winning move
+  while (counter < 9 && resultCell == 10){
+    if (checkAvailableCell(newSmallBoard, counter)){
+      newSmallBoard = newSmallBoard.replace(counter, computer) // Simulate Computer's move
+      if (checkWinSituation(newSmallBoard, computer) is Win()){
+        resultCell = counter
+      }else{
+        newSmallBoard = newSmallBoard.replace(counter, Active())
+      }
+    }
+    counter = counter + 1
+  }
+
+  counter = 0
+  // Check for a blocking move
+  while (counter < 9 && resultCell == 10){
+    if (checkAvailableCell(newSmallBoard, counter)){
+      newSmallBoard = newSmallBoard.replace(counter, player) // // Simulate Player's move
+      if (checkWinSituation(newSmallBoard, player) is Win()){
+        resultCell = counter
+      }else{
+        newSmallBoard = newSmallBoard.replace(counter, Active())
+      }
+    }
+    counter = counter + 1
+  }
+
+  counter = 0
+  // Choose center if available (strong strategically)
+  if ((checkAvailableCell(newSmallBoard, 4)) && resultCell == 10){
+    resultCell = 4
+  }
+
+  counter = 0
+  // Choose a corner if available
+  [0,2,6,8].foreach { cellPos =>
+  if ((checkAvailableCell(newSmallBoard, cellPos)) && resultCell == 10){
+      resultCell = cellPos
+    }
+  }
+
+  // Choose any available side
+  [1, 3, 5, 7].foreach { cellPos =>
+  if ((checkAvailableCell(newSmallBoard, cellPos)) && resultCell == 10){
+      resultCell = cellPos
+    }
+  }
+  resultCell
+}
+
+def isComputerTurn(currentPlayer: Cell, computer: Cell): Bool = {
+  var pcCross: Bool = false
+  var returnValue: Bool = false
+  if (computer is Cross()) pcCross = true
+  if (currentPlayer is Cross() and pcCross) returnValue = true
+  if (currentPlayer is Nought() and not(pcCross)) returnValue = true
+  returnValue
 }
