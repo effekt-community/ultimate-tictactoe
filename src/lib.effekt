@@ -43,30 +43,29 @@ def playerString(player: Cell): String = {
   }
 }
 
-/*
- * Compares two lists and gives true if they're the same
- * Input: list1, list2
- * Output: Bool
-*/
-def compare(list1: List[Int], list2: List[Int]): Bool = {
-  with on[OutOfBounds].panic
+// /*
+//  * Compares two lists and gives true if they're the same
+//  * Input: list1, list2
+//  * Output: Bool
+// */
+// def compare(list1: List[Int], list2: List[Int]): Bool = {
+//   with on[OutOfBounds].panic
 
-  
-  if ((list1.size == list2.size) && not(list1.size == 0)){
-    var counter: Int = 0
-    var output: Bool = true
-    while (counter < list1.size && output){
-      if(list1.get(counter) == list2.get(counter)){
-        counter = counter + 1
-      } else {
-        output = false
-      }
-    }
-    output
-  }else{
-    false
-  }
-}
+//   if ((list1.size == list2.size) && not(list1.size == 0)){
+//     var counter: Int = 0
+//     var output: Bool = true
+//     while (counter < list1.size && output){
+//       if(list1.get(counter) == list2.get(counter)){
+//         counter = counter + 1
+//       } else {
+//         output = false
+//       }
+//     }
+//     output
+//   }else{
+//     false
+//   }
+// }
 
 def consoleInput(): String = {
   with console

@@ -8,7 +8,6 @@ import src/Render
 import src/Generate
 
 
-
 def playGame(): Unit = {
 
   // Returns the chosen Game Mode
@@ -81,6 +80,7 @@ def playGame(): Unit = {
     }
   }
 
+  // Core Game Loop
   def gameLoop(player: Cell, gameMode: GameMode): Unit / {WrongInput} = {
     var endGame: Bool = false
 
@@ -95,28 +95,10 @@ def playGame(): Unit = {
 
     printGameScreen(gameBoard, player)
 
-    // if (player is Cross()) {
-    //   println("You're starting the game!\nChoose the starting Small Board.")
-    //   currentSmallBoard = chooseSmallBoard(gameBoard)
-    //   gameBoard = newActiveSmallBoard(gameBoard, currentSmallBoard)
-    // } else {
-    //   println("Opponent is starting the game!\n")
-    //   if (gameMode is Computer()){
-    //     currentSmallBoard = computerPlay(gameBoard.smallCopy, computer)
-    //     gameBoard = newActiveSmallBoard(gameBoard, currentSmallBoard)
-    //   }else{
-    //     currentSmallBoard = chooseSmallBoard(gameBoard)
-    //     gameBoard = newActiveSmallBoard(gameBoard, currentSmallBoard)
-    //   }
-    // }
-    println("You're starting the game!\nChoose the starting Small Board.")
-    currentSmallBoard = chooseSmallBoard(gameBoard)
-    gameBoard = newActiveSmallBoard(gameBoard, currentSmallBoard)
+    println(playerString(currentPlayer) ++ " - You're starting the game!\nChoose the starting Small Board.")
 
     // INNER GAME LOOP OF ONE GAME
     while (not(endGame)){
-      
-      
       // Choose the new Small Board
       if (currentSmallBoard == 10) {
         if (gameMode is Computer()) {
@@ -167,11 +149,6 @@ def playGame(): Unit = {
       currentCell = 10
 
       // Verify if the game has been won
-      if (checkWinSituation(gameBoard.smallCopy, currentPlayer) is Win()){
-        println(playerString(currentPlayer) ++ ", You won the game!")
-        consoleInput()
-        endGame = true
-      }
 
       checkWinSituation(gameBoard.smallCopy, currentPlayer) match {
         case Win() => {
@@ -189,6 +166,8 @@ def playGame(): Unit = {
       // Change The Current Player
       if(currentPlayer is Cross()) currentPlayer = Nought()
       else currentPlayer = Cross()
+
+      printGameScreen(gameBoard, currentPlayer)
       ()
     }
   }
