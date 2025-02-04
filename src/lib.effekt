@@ -3,6 +3,8 @@ module src/lib
 import io/console
 
 effect WrongInput(msg: String): Unit
+effect ExitGame(): Unit
+effect PrintRules(): Unit
 
 type GameMode {
   Local()
@@ -27,6 +29,7 @@ type WinBoard {
 
 type SmallBoard = List[Cell]
 type BigBoard = List[SmallBoard]
+
 record GameBoard(bigBoard: BigBoard, smallCopy: SmallBoard)
 
 val Numbers: List[String] = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]

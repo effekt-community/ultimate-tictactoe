@@ -11,12 +11,14 @@ import src/Generate
 def playGame(): Unit = {
 
   // Returns the chosen Game Mode
-  def chooseGameMode(): GameMode / {WrongInput} = {
-    println("Choose the Game Mode:\n[1 - Local, 2 - vs Computer]:")
+  def chooseGameMode():  GameMode / {WrongInput, ExitGame, PrintRules} = {
+    println("Choose the Game Mode:\n[1 - Local; 2 - vs Computer;  h - Read the rules; q - Exit the game]")
     val side = consoleInput()
     side match {
       case "1" => Local()
       case "2" => Computer()
+      case "h" => do PrintRules(); chooseGameMode()
+      case "q" => do ExitGame(); chooseGameMode()
       case _ =>
         do WrongInput("Invalid Game Mode. Please type '1' or '2'!")
         chooseGameMode()
@@ -24,12 +26,13 @@ def playGame(): Unit = {
   }
 
   // Returns the Cell type for the side
-  def chooseSide(): Cell / {WrongInput} = {
+  def chooseSide(): Cell / {WrongInput, ExitGame} = {
     println("Choose the side[X, O]:")
     val side = consoleInput()
     side match {
       case "X" => Cross()
       case "O" => Nought()
+      case "q" => do ExitGame(); chooseSide()
       case _ =>
         do WrongInput("Invalid player type. Please type 'X' or 'O'!")
         chooseSide()
@@ -174,21 +177,15 @@ def playGame(): Unit = {
 
   // MAIN SECTION
 
-  clearScreen()
-
   // Greeting Message
-  println("Welcome to the ULTIMATE TIC-TAC-TOE!")
-  println("Press enter to start the game.")
-
-  consoleInput()
+  printWelcomeScreen()
   
   var play: Bool = true
 
-  var player: Cell = Nought()
+  var player: Cell = Cross()
 
   var gameMode: GameMode = Local()
   while (play) {
-
     try{
       // Choosing a Game Mode
       gameMode = chooseGameMode()
@@ -202,9 +199,14 @@ def playGame(): Unit = {
     } with WrongInput { msg =>
       println(msg)
       resume(())
+    } with ExitGame {
+      play = false
+    } with PrintRules {
+      printRules()
+      resume(())
     }
   }
-  println("Goodbye!")
+  printExitScreen()
 }
 
 
