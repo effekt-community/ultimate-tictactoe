@@ -5,7 +5,7 @@ import io/console
 import tty
 import char
 effect WrongInput(msg: String): Unit
-effect ExitGame(): Unit
+effect ExitGame(): Nothing
 effect PrintRules(): Unit
 
 type GameMode {
@@ -34,12 +34,8 @@ type BigBoard = List[SmallBoard]
 
 record GameBoard(bigBoard: BigBoard, smallCopy: SmallBoard)
 
-val Numbers: List[String] = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
 val winCombinations: List[List[Int]] = [[0,1,2], [3,4,5], [6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]
 
-
-
-def helloWorld(): String = "Hello, world!"
 
 def playerString(player: Cell): String = {
   player match {

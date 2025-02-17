@@ -7,7 +7,7 @@ import stream
 import src/lib
 import src/Render
 import src/Generate
-
+import src/Opponent
 
 def playGame(): Unit = {
   // Returns the chosen Game Mode
@@ -18,7 +18,7 @@ def playGame(): Unit = {
       case '1' => Local()
       case '2' => Computer()
       case 'h' => do PrintRules(); chooseGameMode()
-      case 'q' => do ExitGame(); chooseGameMode()
+      case 'q' => do ExitGame()
       case _ =>
         do WrongInput("Invalid Game Mode. Please type '1' or '2'!")
         chooseGameMode()
