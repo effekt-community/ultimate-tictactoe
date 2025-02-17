@@ -14,25 +14,23 @@ type GameMode {
 }
 
 type Cell {
-  Empty()
-  Active()
   Nought()
   Cross()
   Draw()
-  NewLine()
-  Separator()
+  Active()
+  Empty()
 }
 
-type WinBoard {
+type FinishState {
   Win()
   Lose()
-  Nope()
 }
 
 type SmallBoard = List[Cell]
 type BigBoard = List[SmallBoard]
 
 record GameBoard(bigBoard: BigBoard, smallCopy: SmallBoard)
+record Finish(isFinished: Bool, state: FinishState, player: Cell)
 
 val winCombinations: List[List[Int]] = [[0,1,2], [3,4,5], [6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]
 
@@ -63,6 +61,5 @@ def parseDigit(c: Char): Int = {
   }
 }
 
-def newLine(): Unit = {
+def newLine(): Unit =
   println("\n")
-}

@@ -99,13 +99,13 @@ def checkAvailableCell(smallBoard: SmallBoard, cellNumber: Int): Bool = {
  * Input : SmallBoardNumber, player
  * Output : Boolean
  */
-def checkWinSituation(smallBoard: SmallBoard, player: Cell): WinBoard = {
+def checkWinSituation(smallBoard: SmallBoard, player: Cell): Finish = {
   var cr: Bool = true
   if (player is Cross()) cr = true else cr = false
   var checkedCells: List[Int] = empty()
   var counter: Int = 0
-  var win: WinBoard = Nope()
-  
+  var isFinished: Bool = false
+  var finishState: FinishState = Lose()
   smallBoard.foreach {cell =>
     cell match {
       case Cross() => if (cr) checkedCells = checkedCells.insert(checkedCells.size(), counter)
@@ -121,25 +121,23 @@ def checkWinSituation(smallBoard: SmallBoard, player: Cell): WinBoard = {
     combination.foreach { el =>
       if(any(checkedCells) {cell => cell == el}) counter = counter + 1
     }
-    if (counter == 3) win = Win()
+    if (counter == 3){isFinished = true; finishState = Win()}
     else counter = 0
   }
 
   // Check if there's a draw in board
   counter = 0
-  if (win is Nope()){
+  if (isFinished is false){
       smallBoard.foreach {cell =>
       cell match {
         case Cross() => counter = counter + 1
         case Nought() => counter = counter + 1
         case _ => ()
       }
-      if (counter == 9) {
-        win = Lose()
-      }
+      if (counter == 9) {isFinished = true; finishState = Lose()}
     }
   }
-  win
+  Finish(isFinished, finishState, player)
 }
 
 def fillWinningGameBoard(gameBoard: GameBoard, smallBoardNumber: Int, player: Cell): GameBoard = {

@@ -16,28 +16,10 @@ def renderBoard(board: BigBoard): Unit = {
     smallBoards = smallBoards.insert(smallBoards.size(), board.get(counter * 3 + 1))
     smallBoards = smallBoards.insert(smallBoards.size(), board.get(counter * 3 + 2))
     counter = counter + 1
-    val bigRow: List[Cell] = createUnifiedRow(smallBoards)
-    renderRow(bigRow)
+    println(createUnifiedRow(smallBoards))
     renderSeparator()
   }
   ()
-}
-
-def renderRow(row: List[Cell]): Unit = {
-  with Formatted::formatting
-  var newRow: String = ""
-  row.foreach {c =>
-    c match {
-      case Empty() => newRow = newRow ++ "·".yellow ++ " "
-      case Draw() => newRow = newRow ++ "—".yellow ++ " "
-      case Active() => newRow = newRow ++ "◦".cyan ++ " "
-      case Cross() => newRow = newRow ++ "X".red ++ " "
-      case Nought() => newRow = newRow ++ "O".green ++ " "
-      case NewLine() => newRow = newRow ++ "\n"
-      case Separator() => newRow = newRow ++ "|".magenta ++ " "
-    }
-  }
-  println(newRow)
 }
 
 def renderSeparator(): Unit = {
@@ -48,34 +30,44 @@ def renderSeparator(): Unit = {
   println(separator.foldLeft("") { (acc, elem) => acc ++ elem ++ " "})
 }
 
-def createUnifiedRow(boardRow: List[SmallBoard]): List[Cell] = {
+def createUnifiedRow(boardRow: List[SmallBoard]): String = {
+  with Formatted::formatting
+
   var boardsRow: List[SmallBoard] = boardRow
-
-  var unifiedRow: List[List[Cell]] = empty()
-
+  
   var counterSmallBoard: Int = 0
   var counterRow: Int = 0
+  var newRow = ""
 
   while (counterRow < 3) {
     with on[OutOfBounds].panic // disable all the error messages
     var smallBoard: SmallBoard = boardsRow.get(counterSmallBoard) // Taking the small board
-    unifiedRow = unifiedRow.insert(unifiedRow.size(), smallBoard.take(3)) // insert the row of the small board
+    smallBoard.take(3).foreach { cell =>
+      cell match {
+        case Empty() => newRow = newRow ++ "· ".yellow
+        case Draw() => newRow = newRow ++ "— ".yellow
+        case Active() => newRow = newRow ++ "◦ ".cyan
+        case Cross() => newRow = newRow ++ "X ".red
+        case Nought() => newRow = newRow ++ "O ".green
+      }
+    }
     smallBoard = smallBoard.drop(3) // remove the row from the small board
     boardsRow = boardsRow.replace(counterSmallBoard, smallBoard) // replace the small board with the new one
+    
     if (counterSmallBoard == 2) {
-      unifiedRow = unifiedRow.insert(unifiedRow.size(), [NewLine()]) // new line symbol
+      if (counterRow != 2) newRow = newRow ++ "\n"
       counterSmallBoard = 0
       counterRow = counterRow + 1
-    } else {
-      unifiedRow = unifiedRow.insert(unifiedRow.size(), [Separator()]) // insert the separator
+    }
+    else {
+      newRow = newRow ++ "| ".magenta
       counterSmallBoard = counterSmallBoard + 1
     }
     ()
   }
-  var resultRow: List[Cell] = unifiedRow.join()
-  resultRow = resultRow.deleteAt(resultRow.size() - 1) // remove the last new line
-  resultRow
+  newRow
 }
+
 
 def printGameScreen(gameBoard: GameBoard, player: Cell): Unit = {
   println(Screen::clear())

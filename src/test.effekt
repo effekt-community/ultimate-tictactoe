@@ -3,6 +3,7 @@ module src/test
 import test
 import src/lib
 import src/Generate
+import src/Opponent
 
 def main() = mainSuite("main") {
   with on[OutOfBounds].panic
@@ -11,10 +12,6 @@ def main() = mainSuite("main") {
     var board: SmallBoard = fill(9, Empty())
     combination.foreach { index => board = board.replace(index, player) }
     board
-  }
-
-  test("Hello world") {
-    assertEqual(helloWorld(), "Hello, world!")
   }
   test("Player String for Cross") {
     assertEqual(playerString(Cross()), "X")
@@ -116,20 +113,20 @@ def main() = mainSuite("main") {
   test("Winning Combinations"){
     winCombinations.take(3).foreach { combination => // First 3 are rows
         val winBoard = createWinBoard(combination, Cross())
-        assertEqual(checkWinSituation(winBoard, Cross()), Win())
+        assertEqual(checkWinSituation(winBoard, Cross()), Finish(true, Win(), Cross()))
       }
   }
-  test("Draw (Lose)") {
+  test("Lose") {
     var drawBoard: SmallBoard = empty()
     [Cross(), Nought(), Cross(), Nought(), Cross(), Cross(), Nought(), Cross(), Nought()].foreach { player =>
       drawBoard = drawBoard.insert(drawBoard.size(), player)
     }
-    assertEqual(checkWinSituation(drawBoard, Cross()), Lose())
+    assertEqual(checkWinSituation(drawBoard, Cross()), Finish(true, Lose(), Cross()))
   }
 
   test("No Win Yet") {
     val noWinBoard: SmallBoard = [Cross(), Empty(), Nought(), Empty(), Cross(), Empty(), Empty(), Empty(), Nought()]
-    assertEqual(checkWinSituation(noWinBoard, Cross()), Nope())
+    assertEqual(checkWinSituation(noWinBoard, Cross()), Finish(false, Lose(), Cross()))
   }
 
   test("fillWinningGameBoard fills with Cross") {

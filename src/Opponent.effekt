@@ -24,7 +24,7 @@ def computerPlay(smallBoard: SmallBoard, computer: Cell): Int = {
   while (counter < 9 && resultCell == 10){
     if (checkAvailableCell(newSmallBoard, counter)){
       newSmallBoard = newSmallBoard.replace(counter, computer) // Simulate Computer's move
-      if (checkWinSituation(newSmallBoard, computer) is Win()){
+      if (checkWinSituation(newSmallBoard, computer).state is Win()){
         resultCell = counter
       }else{
         newSmallBoard = newSmallBoard.replace(counter, Active())
@@ -38,7 +38,7 @@ def computerPlay(smallBoard: SmallBoard, computer: Cell): Int = {
   while (counter < 9 && resultCell == 10){
     if (checkAvailableCell(newSmallBoard, counter)){
       newSmallBoard = newSmallBoard.replace(counter, player) // // Simulate Player's move
-      if (checkWinSituation(newSmallBoard, player) is Win()){
+      if (checkWinSituation(newSmallBoard, player).state is Win()){
         resultCell = counter
       }else{
         newSmallBoard = newSmallBoard.replace(counter, Active())
