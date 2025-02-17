@@ -127,7 +127,7 @@ def playGame(): Unit = {
           consoleInput()
           gameBoard = fillWinningGameBoard(gameBoard, currentSmallBoard, currentPlayer)
         }
-        case Loose() => {
+        case Lose() => {
           println("\n It's a draw in the Small Board!")
           consoleInput()
           gameBoard = fillWinningGameBoard(gameBoard, currentSmallBoard, Draw())
@@ -159,7 +159,7 @@ def playGame(): Unit = {
           consoleInput()
           endGame = true
         }
-        case Loose() => {
+        case Lose() => {
           println(playerString(currentPlayer) ++ ", You lost the game!")
           consoleInput()
           endGame = true

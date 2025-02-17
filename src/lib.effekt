@@ -23,7 +23,7 @@ type Cell {
 
 type WinBoard {
   Win()
-  Loose()
+  Lose()
   Nope()
 }
 

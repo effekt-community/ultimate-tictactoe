@@ -135,7 +135,7 @@ def checkWinSituation(smallBoard: SmallBoard, player: Cell): WinBoard = {
         case _ => ()
       }
       if (counter == 9) {
-        win = Loose()
+        win = Lose()
       }
     }
   }
@@ -211,11 +211,9 @@ def computerPlay(smallBoard: SmallBoard, computer: Cell): Int = {
   resultCell
 }
 
-def isComputerTurn(currentPlayer: Cell, computer: Cell): Bool = {
-  var pcCross: Bool = false
-  var returnValue: Bool = false
-  if (computer is Cross()) pcCross = true
-  if (currentPlayer is Cross() and pcCross) returnValue = true
-  if (currentPlayer is Nought() and not(pcCross)) returnValue = true
-  returnValue
-}
+def isComputerTurn(currentPlayer: Cell, computer: Cell): Bool =
+  (currentPlayer, computer) match {
+    case (Cross(), Cross()) => true
+    case (Nought(), Nought()) => true
+    case _ => false
+  }

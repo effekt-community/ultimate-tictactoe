@@ -119,12 +119,12 @@ def main() = mainSuite("main") {
         assertEqual(checkWinSituation(winBoard, Cross()), Win())
       }
   }
-  test("Draw (Loose)") {
+  test("Draw (Lose)") {
     var drawBoard: SmallBoard = empty()
     [Cross(), Nought(), Cross(), Nought(), Cross(), Cross(), Nought(), Cross(), Nought()].foreach { player =>
       drawBoard = drawBoard.insert(drawBoard.size(), player)
     }
-    assertEqual(checkWinSituation(drawBoard, Cross()), Loose())
+    assertEqual(checkWinSituation(drawBoard, Cross()), Lose())
   }
 
   test("No Win Yet") {
