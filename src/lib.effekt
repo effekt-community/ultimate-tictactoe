@@ -3,6 +3,7 @@ module src/lib
 import io/console
 
 import tty
+import char
 effect WrongInput(msg: String): Unit
 effect ExitGame(): Unit
 effect PrintRules(): Unit
@@ -48,9 +49,22 @@ def playerString(player: Cell): String = {
   }
 }
 
-def consoleInput(): String = {
+def consoleInput(): Char = {
+  with on[OutOfBounds].panic
   with console
-  do readLine()
+  val input = do readLine()
+  if (input.length() == 1) {
+    charAt(input, 0)
+  }else{
+    ' '
+  }
+}
+
+def parseDigit(c: Char): Int = {
+  digitValue(c) match {
+    case Some(value) => value
+    case None() => 0
+  }
 }
 
 def newLine(): Unit = {
