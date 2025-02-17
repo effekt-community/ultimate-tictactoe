@@ -2,6 +2,7 @@ module src/lib
 
 import io/console
 
+import tty
 effect WrongInput(msg: String): Unit
 effect ExitGame(): Unit
 effect PrintRules(): Unit
@@ -50,11 +51,6 @@ def playerString(player: Cell): String = {
 def consoleInput(): String = {
   with console
   do readLine()
-}
-
-def clearScreen(): Unit = {
-  println("\u001b[2J") // clear the screen
-  println("\u001b[H") // move the cursor to the top left corner
 }
 
 def newLine(): Unit = {

@@ -9,7 +9,6 @@ import src/Generate
 
 
 def playGame(): Unit = {
-
   // Returns the chosen Game Mode
   def chooseGameMode():  GameMode / {WrongInput, ExitGame, PrintRules} = {
     println("Choose the Game Mode:\n[1 - Local; 2 - vs Computer;  h - Read the rules; q - Exit the game]")

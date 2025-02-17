@@ -78,7 +78,7 @@ def createUnifiedRow(boardRow: List[SmallBoard]): List[Cell] = {
 }
 
 def printGameScreen(gameBoard: GameBoard, player: Cell): Unit = {
-  clearScreen()
+  println(Screen::clear())
   println("You're playing as " ++ playerString(player))
   newLine()
   
@@ -87,7 +87,7 @@ def printGameScreen(gameBoard: GameBoard, player: Cell): Unit = {
 }
 
 def printWelcomeScreen(): Unit = {
-  clearScreen()
+  println(Screen::clear())
   with Formatted::formatting
   val welcomeScreen: String = """
    __  ____  ____________  ______  ____________   ________________   _________   ______   __________  ______
@@ -105,7 +105,7 @@ def printWelcomeScreen(): Unit = {
 }
 
 def printExitScreen(): Unit = {
-  clearScreen()
+  println(Screen::clear())
   with Formatted::formatting
   val exitScreen: String = """
      ______                ____               __
@@ -124,7 +124,7 @@ def printExitScreen(): Unit = {
 }
 
 def printRules(): Unit = {
-  clearScreen()
+  println(Screen::clear())
   val rules: String = """
     Ultimate Tic-Tac-Toe Rules:
 
@@ -147,5 +147,5 @@ def printRules(): Unit = {
   """
   println(rules)
   consoleInput()
-  clearScreen()
+  println(Screen::clear())
 }
