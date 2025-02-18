@@ -9,8 +9,19 @@ import src/Render
 import src/Generate
 import src/Opponent
 
+
+/*
+ * Core Function of the Game
+ * Input : None
+ * Output : Unit
+ */
 def playGame(): Unit = {
-  // Returns the chosen Game Mode
+  
+  /*
+   * Returns the chosen Game Mode
+   * Input : None
+   * Output : GameMode
+   */
   def chooseGameMode():  GameMode / {WrongInput, ExitGame, PrintRules} = {
     println("Choose the Game Mode:\n[1 - Local; 2 - vs Computer;  h - Read the rules; q - Exit the game]")
     val side = consoleInput()
@@ -20,26 +31,36 @@ def playGame(): Unit = {
       case 'h' => do PrintRules(); chooseGameMode()
       case 'q' => do ExitGame()
       case _ =>
-        do WrongInput("Invalid Game Mode. Please type '1' or '2'!")
+        do WrongInput("Invalid Game Mode. Available options: [1, 2, h, q]!")
         chooseGameMode()
     }
   }
 
-  // Returns the Cell type for the side
+
+  /*
+   * Returns the Cell Type of the player
+   * Input : None
+   * Output : Cell
+   */
   def chooseSide(): Cell / {WrongInput, ExitGame} = {
     println("Choose the side[X, O]:")
     val side = consoleInput()
     side match {
       case 'X' => Cross()
       case 'O' => Nought()
-      case 'q' => do ExitGame(); chooseSide()
+      case 'q' => do ExitGame()
       case _ =>
-        do WrongInput("Invalid player type. Please type 'X' or 'O'!")
+        do WrongInput("Invalid player type. Available options: [X, O, q]!")
         chooseSide()
     }
   }
 
-  // Returns the Small Board Number [0 - 8]
+
+  /*
+   * Returns the Small Board Number
+   * Input : gameBoard: GameBoard
+   * Output : Int [0 - 8]
+   */
   def chooseSmallBoard(gameBoard: GameBoard): Int / {WrongInput} = {
     println("Choose the Small Board[1 - 9]:")
     val smallBoardNumber: Char = consoleInput()
@@ -60,10 +81,16 @@ def playGame(): Unit = {
     }
   }
 
-  // Returns the chosen Cell inside the board [0 - 8]
+
+  /*
+   * Returns the chosen Cell inside the board
+   * Input : gameBoard: GameBoard
+   * Output : Int [0 - 8]
+   */
   def chooseCell(gameBoard: GameBoard, smallBoardNumber: Int): Int / {WrongInput} = {
     with on[OutOfBounds].panic
-    println("Choose the cell inside your Small Board")
+
+    println("Choose the cell inside the chosen Small Board")
     val cellNumber: Char = consoleInput()
 
     if (isDigit(cellNumber)) {
@@ -81,7 +108,12 @@ def playGame(): Unit = {
     }
   }
 
-  // Core Game Loop
+
+  /*
+   * Core Game Loop
+   * Input : player: Cell, gameMode: GameMode
+   * Output : Unit
+   */
   def gameLoop(player: Cell, gameMode: GameMode): Unit / {WrongInput} = {
     var endGame: Bool = false
 
@@ -100,48 +132,49 @@ def playGame(): Unit = {
 
     // INNER GAME LOOP OF ONE GAME
     while (not(endGame)){
+      with on[OutOfBounds].panic
       // Choose the new Small Board
       if (currentSmallBoard == 10) {
         if (gameMode is Computer()) {
           if (isComputerTurn(currentPlayer, computer)) currentSmallBoard = computerPlay(gameBoard.smallCopy, computer)
           else currentSmallBoard = chooseSmallBoard(gameBoard)
         }else currentSmallBoard = chooseSmallBoard(gameBoard)
-        gameBoard = newActiveSmallBoard(gameBoard, currentSmallBoard)
+        gameBoard = activateSmallBoard(gameBoard, currentSmallBoard)
       }
 
       // The Move Phase
       printGameScreen(gameBoard, currentPlayer)
       if (gameMode is Computer()) {
-        with on[OutOfBounds].panic
         if (isComputerTurn(currentPlayer, computer)) currentCell = computerPlay(gameBoard.bigBoard.get(currentSmallBoard), computer)
         else currentCell = chooseCell(gameBoard, currentSmallBoard)
       }else currentCell = chooseCell(gameBoard, currentSmallBoard)
 
       gameBoard = checkNewCell(gameBoard, currentSmallBoard, currentCell, currentPlayer)
-      with on[OutOfBounds].panic
+
       // val finish = checkWinSituation(gameBoard.bigBoard.get(currentSmallBoard), currentPlayer) match {
       val finish: Finish = checkWinSituation(gameBoard.bigBoard.get(currentSmallBoard), currentPlayer)
       if (finish.isFinished) {
         finish.state match {
           case Win() => {
             println("\nYou won the Small Board!")
-            consoleInput()
             gameBoard = fillWinningGameBoard(gameBoard, currentSmallBoard, currentPlayer)
           }
           case Lose() => {
             println("\n It's a draw in the Small Board!")
-            consoleInput()
             gameBoard = fillWinningGameBoard(gameBoard, currentSmallBoard, Draw())
           }
         }
+        consoleInput()
+        ()
       }
+
       // After The Player's Move
 
       // Change the Current Small Board
       if (checkAvailableCell(gameBoard.smallCopy, currentCell)){
         gameBoard = deactivateSmallBoard(gameBoard, currentSmallBoard)
         currentSmallBoard = currentCell
-        gameBoard = newActiveSmallBoard(gameBoard, currentSmallBoard)
+        gameBoard = activateSmallBoard(gameBoard, currentSmallBoard)
       } else {
         gameBoard = deactivateSmallBoard(gameBoard, currentSmallBoard)
         currentSmallBoard = 10
@@ -152,48 +185,31 @@ def playGame(): Unit = {
       val finishGame: Finish = checkWinSituation(gameBoard.smallCopy, currentPlayer)
       if (finishGame.isFinished) {
         finishGame.state match {
-          case Win() => {
-            println(playerString(currentPlayer) ++ ", You won the game!")
-            consoleInput()
-            endGame = true
-          }
-          case Lose() => {
-            println(playerString(currentPlayer) ++ ", You lost the game!")
-            consoleInput()
-            endGame = true
-          }
+          case Win() => println(playerString(currentPlayer) ++ ", You won the game!")
+          case Lose() => println(playerString(currentPlayer) ++ ", You lost the game!")
         }
+        consoleInput()
+        endGame = true
       }
       // Change The Current Player
       if(currentPlayer is Cross()) currentPlayer = Nought()
       else currentPlayer = Cross()
 
       printGameScreen(gameBoard, currentPlayer)
-      ()
     }
   }
 
   // MAIN SECTION
-
   // Greeting Message
   printWelcomeScreen()
   
-  var play: Bool = true
-
-  var player: Cell = Cross()
+  var play = true
 
   var gameMode: GameMode = Local()
   while (play) {
     try{
-      // Choosing a Game Mode
-      gameMode = chooseGameMode()
-
-      // Choosing a player side
-      player = chooseSide()
-
       // Starting the game
-      gameLoop(player, gameMode)
-
+      gameLoop(chooseSide(), chooseGameMode())
     } with WrongInput { msg =>
       println(msg)
       resume(())

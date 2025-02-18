@@ -5,23 +5,23 @@ import tty
 import io/console
 import stream
 
+
+/*
+ * Prints the Big Board in the terminal
+ * Input : board: BigBoard
+ * Output : Unit
+ */
 def renderBoard(board: BigBoard): Unit = {
-  with Formatted::formatting
-  var counter = 0
   renderSeparator()
-  while (counter < 3) {
-    with on[OutOfBounds].panic
-    var smallBoards: List[SmallBoard] = empty()
-    smallBoards = smallBoards.insert(smallBoards.size(), board.get(counter * 3))
-    smallBoards = smallBoards.insert(smallBoards.size(), board.get(counter * 3 + 1))
-    smallBoards = smallBoards.insert(smallBoards.size(), board.get(counter * 3 + 2))
-    counter = counter + 1
-    println(createUnifiedRow(smallBoards))
-    renderSeparator()
-  }
-  ()
+  [0,3,6].foreach {c => println(createUnifiedRow(board.slice(c,c+3))); renderSeparator()}
 }
 
+
+/*
+ * Prints separator line in the terminal
+ * Input : None
+ * Output : Unit
+ */
 def renderSeparator(): Unit = {
   with Formatted::formatting
   var separator: List[String] = fill(11, "—".magenta)
@@ -30,8 +30,15 @@ def renderSeparator(): Unit = {
   println(separator.foldLeft("") { (acc, elem) => acc ++ elem ++ " "})
 }
 
+
+/*
+ * Creates unified line for further printing in the terminal
+ * Input : boardRow: List[SmallBoard]
+ * Output : String
+ */
 def createUnifiedRow(boardRow: List[SmallBoard]): String = {
   with Formatted::formatting
+  with on[OutOfBounds].panic
 
   var boardsRow: List[SmallBoard] = boardRow
   
@@ -40,8 +47,8 @@ def createUnifiedRow(boardRow: List[SmallBoard]): String = {
   var newRow = ""
 
   while (counterRow < 3) {
-    with on[OutOfBounds].panic // disable all the error messages
-    var smallBoard: SmallBoard = boardsRow.get(counterSmallBoard) // Taking the small board
+    
+    var smallBoard: SmallBoard = boardsRow.get(counterSmallBoard)
     smallBoard.take(3).foreach { cell =>
       cell match {
         case Empty() => newRow = newRow ++ "· ".yellow
@@ -63,12 +70,16 @@ def createUnifiedRow(boardRow: List[SmallBoard]): String = {
       newRow = newRow ++ "| ".magenta
       counterSmallBoard = counterSmallBoard + 1
     }
-    ()
   }
   newRow
 }
 
 
+/*
+ * Clears the screen and prints updated Game Screen
+ * Input : gameBoard: GameBoard, player: Cell
+ * Output : Unit
+ */
 def printGameScreen(gameBoard: GameBoard, player: Cell): Unit = {
   println(Screen::clear())
   println("You're playing as " ++ playerString(player))
@@ -78,9 +89,16 @@ def printGameScreen(gameBoard: GameBoard, player: Cell): Unit = {
   newLine()
 }
 
+
+/*
+ * Prints Welcome message in the Terminal
+ * Input : None
+ * Output : Unit
+ */
 def printWelcomeScreen(): Unit = {
   println(Screen::clear())
   with Formatted::formatting
+  
   val welcomeScreen: String = """
    __  ____  ____________  ______  ____________   ________________   _________   ______   __________  ______
   / / / / / /_  __/  _/  |/  /   |/_  __/ ____/  /_  __/  _/ ____/  /_  __/   | / ____/  /_  __/ __ \/ ____/
@@ -96,9 +114,16 @@ def printWelcomeScreen(): Unit = {
   ()
 }
 
+
+/*
+ * Prints Exit message in the Terminal
+ * Input : None
+ * Output : Unit
+ */
 def printExitScreen(): Unit = {
   println(Screen::clear())
   with Formatted::formatting
+
   val exitScreen: String = """
      ______                ____               __
     / ____/___  ____  ____/ / /_  __  _____  / /
@@ -112,11 +137,19 @@ def printExitScreen(): Unit = {
   println("\u001b[10H") // Move the cursor to the middle
   println(exitScreen)
   consoleInput()
-  ()
+  println(Screen::clear())
 }
 
+
+/*
+ * Prints Rules in the Terminal
+ * Input : None
+ * Output : Unit
+ */
 def printRules(): Unit = {
   println(Screen::clear())
+  with Formatted::formatting
+
   val rules: String = """
     Ultimate Tic-Tac-Toe Rules:
 
@@ -136,7 +169,7 @@ def printRules(): Unit = {
     you can play in any of the other 8 small boards.
 
     [Enter]
-  """
+  """.green
   println(rules)
   consoleInput()
   println(Screen::clear())

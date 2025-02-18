@@ -5,6 +5,7 @@ import io/console
 import stream
 import src/lib
 
+
 /**
  * Generates a new BigBoard
  * Input : None
@@ -17,8 +18,12 @@ def generateNewBigBoard(): GameBoard = {
 }
 
 
-// Makes a new Small Board Active()
-def newActiveSmallBoard(gameBoard: GameBoard, smallBoardNumber: Int): GameBoard = {
+/**
+ * Makes a new Small Board Active()
+ * Input : gameBoard: GameBoard, smallBoardNumber: Int
+ * Output : updated GameBoard
+ */
+def activateSmallBoard(gameBoard: GameBoard, smallBoardNumber: Int): GameBoard = {
   with on[OutOfBounds].panic
 
   var newBigBoard: BigBoard = gameBoard.bigBoard
@@ -37,13 +42,18 @@ def newActiveSmallBoard(gameBoard: GameBoard, smallBoardNumber: Int): GameBoard 
       case _ => ()
     }
     counter = counter + 1
-    ()
   }
 
   newBigBoard = newBigBoard.replace(smallBoardNumber, newSmallBoard)
   GameBoard(newBigBoard, newGameBoardSmallCopy)
 }
 
+
+/**
+ * Deactivate the Small Board
+ * Input : gameBoard: GameBoard, smallBoardNumber: Int
+ * Output : updated GameBoard
+ */
 def deactivateSmallBoard(gameBoard: GameBoard, smallBoardNumber: Int): GameBoard = {
   with on[OutOfBounds].panic
 
@@ -60,12 +70,17 @@ def deactivateSmallBoard(gameBoard: GameBoard, smallBoardNumber: Int): GameBoard
       case _ => ()
     }
     counter = counter + 1
-    ()
   }
   newBigBoard = newBigBoard.replace(smallBoardNumber, newSmallBoard)
   GameBoard(newBigBoard, newGameBoardSmallCopy)
 }
 
+
+/**
+ * Checks the cell with a chosen player
+ * Input : gameBoard: GameBoard, smallBoardNumber: Int, cellNumber: Int, player: Cell
+ * Output : updated GameBoard
+ */
 def checkNewCell(gameBoard: GameBoard, smallBoardNumber: Int, cellNumber: Int, player: Cell): GameBoard = {
   with on[OutOfBounds].panic
 
@@ -76,11 +91,11 @@ def checkNewCell(gameBoard: GameBoard, smallBoardNumber: Int, cellNumber: Int, p
   GameBoard(newBigBoard, gameBoard.smallCopy)
 }
 
+
 /*
- * Returns true if the cell is  free.
- * False Otherwise
- * Input : GameBoard, SmallBoardNumber, Cell Number
- * Output : Boolean
+ * Returns true if the cell is  free, false otherwise
+ * Input : smallBoard: SmallBoard, cellNumber: Int
+ * Output : Bool
  */
 def checkAvailableCell(smallBoard: SmallBoard, cellNumber: Int): Bool = {
   with on[OutOfBounds].panic
@@ -93,11 +108,11 @@ def checkAvailableCell(smallBoard: SmallBoard, cellNumber: Int): Bool = {
   }
 }
 
+
 /*
- * Returns true if Current Player has won in this Small Board.
- * False Otherwise
- * Input : SmallBoardNumber, player
- * Output : Boolean
+ * Returns true if Current Player has won in this Small Board, false otherwise
+ * Input : smallBoard: SmallBoard, player: Cell
+ * Output : Finish
  */
 def checkWinSituation(smallBoard: SmallBoard, player: Cell): Finish = {
   var cr: Bool = true
@@ -140,6 +155,12 @@ def checkWinSituation(smallBoard: SmallBoard, player: Cell): Finish = {
   Finish(isFinished, finishState, player)
 }
 
+
+/*
+ * Fills a Small Board with a chosen player.
+ * Input : gameBoard: GameBoard, smallBoardNumber: Int, player: Cell
+ * Output : Updated GameBoard
+ */
 def fillWinningGameBoard(gameBoard: GameBoard, smallBoardNumber: Int, player: Cell): GameBoard = {
   var newBigBoard: BigBoard = gameBoard.bigBoard
   var newGameBoardSmallCopy: SmallBoard = gameBoard.smallCopy

@@ -40,9 +40,9 @@ def main() = mainSuite("main") {
     assertEqual(newGame.smallCopy.size(), 9)
   }
 
-  test("newActiveSmallBoard activates small board 0 and updates smallCopy") {
+  test("Activates small board 0 and updates smallCopy") {
     var game = generateNewBigBoard()
-    game = newActiveSmallBoard(game, 0)
+    game = activateSmallBoard(game, 0)
 
     assertEqual(game.smallCopy.get(0), Active()) // Check smallCopy update
 
@@ -52,9 +52,9 @@ def main() = mainSuite("main") {
     }
   }
 
-  test("newActiveSmallBoard activates small board 5 and updates smallCopy") {
+  test("Activates small board 5 and updates smallCopy") {
     var game = generateNewBigBoard()
-    game = newActiveSmallBoard(game, 5)
+    game = activateSmallBoard(game, 5)
 
     assertEqual(game.smallCopy.get(5), Active()) // Check smallCopy update
 
@@ -64,9 +64,9 @@ def main() = mainSuite("main") {
     }
   }
   
-  test("deactivateSmallBoard deactivates small board 0"){
+  test("Deactivates small board 0"){
     var game = generateNewBigBoard()
-    game = newActiveSmallBoard(game, 0) // First activate it
+    game = activateSmallBoard(game, 0) // First activate it
     game = deactivateSmallBoard(game, 0) // Then deactivate
 
     val smallBoard0 = game.bigBoard.get(0)

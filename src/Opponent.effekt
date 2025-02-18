@@ -3,6 +3,12 @@ module src/Opponent
 import src/lib
 import src/Generate
 
+
+/*
+ * Checks if it's a computer turn right now
+ * Input : currentPlayer: Cell, computer: Cell
+ * Output : Bool
+ */
 def isComputerTurn(currentPlayer: Cell, computer: Cell): Bool =
   (currentPlayer, computer) match {
     case (Cross(), Cross()) => true
@@ -10,6 +16,12 @@ def isComputerTurn(currentPlayer: Cell, computer: Cell): Bool =
     case _ => false
   }
 
+
+/*
+ * Computer Play Logic
+ * Input : smallBoard: SmallBoard, computer: Cell
+ * Output : Int
+ */
 def computerPlay(smallBoard: SmallBoard, computer: Cell): Int = {
   with on[OutOfBounds].panic
   println("It's computer playing.")
@@ -47,13 +59,11 @@ def computerPlay(smallBoard: SmallBoard, computer: Cell): Int = {
     counter = counter + 1
   }
 
-  counter = 0
   // Choose center if available (strong strategically)
   if ((checkAvailableCell(newSmallBoard, 4)) && resultCell == 10){
     resultCell = 4
   }
 
-  counter = 0
   // Choose a corner if available
   [0,2,6,8].foreach { cellPos =>
   if ((checkAvailableCell(newSmallBoard, cellPos)) && resultCell == 10){
