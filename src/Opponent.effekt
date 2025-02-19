@@ -39,11 +39,22 @@ def computerPlay(smallBoard: SmallBoard, computer: Cell): Int = {
             .getOrElse {42}
 }
 
+
+/**
+ * Finds first available move in a board using a given positions list
+ * Input : positions: List[Int], board: SmallBoard
+ * Output : Option[Int]
+ */
 def findFirstAvailable(positions: List[Int], board: SmallBoard): Option[Int] = {
   positions.find { pos => checkAvailableCell(board, pos) }
 }
 
 
+/**
+ * Finds winning move in a board if exists
+ * Input : board: SmallBoard, player: Cell
+ * Output : Option[Int]
+ */
 def findWinningMove(board: SmallBoard, player: Cell): Option[Int] = {
   build(9){ i => i }.find { pos =>
     if (checkAvailableCell(board, pos)){

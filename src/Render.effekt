@@ -174,3 +174,17 @@ def printRules(): Unit = {
   consoleInput()
   println(Screen::clear())
 }
+
+def printBoard(): Unit = {
+  with Formatted::formatting
+  val board = """
+  ----+---+----
+  | 1 | 2 | 3 |
+  |---+---+---|
+  | 4 | 5 | 6 |
+  |---+---+---|
+  | 7 | 8 | 9 |
+  ----+---+----
+  """.red
+  println(board)
+}

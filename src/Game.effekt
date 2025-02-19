@@ -22,16 +22,25 @@ def playGame(): Unit = {
    * Input : None
    * Output : GameMode
    */
-  def chooseGameMode():  GameMode / {WrongInput, ExitGame, PrintRules} = {
-    println("Choose the Game Mode:\n[1 - Local; 2 - vs Computer;  h - Read the rules; q - Exit the game]")
+  def chooseGameMode():  GameMode / {WrongInput, ExitGame, PrintHelp} = {
+    val validOptions = [
+      ("1", "Local"),
+      ("2", "vs Computer"),
+      ("h", "Read rules"),
+      ("q", "Exit game")
+    ]
+    val options: String = "[" ++ validOptions.map { e => e.first ++ " - " ++ e.second }
+                                          .join(", ") ++ "]"
+
+    println("Choose the Game Mode:\n" ++ options)
     val side = consoleInput()
     side match {
       case '1' => Local()
       case '2' => Computer()
-      case 'h' => do PrintRules(); chooseGameMode()
+      case 'h' => do PrintHelp(GameRules()); chooseGameMode()
       case 'q' => do ExitGame()
       case _ =>
-        do WrongInput("Invalid Game Mode. Available options: [1, 2, h, q]!")
+        do WrongInput("Invalid Input!\nAvailable options: " ++ options ++ "\n")
         chooseGameMode()
     }
   }
@@ -42,15 +51,24 @@ def playGame(): Unit = {
    * Input : None
    * Output : Cell
    */
-  def chooseSide(): Cell / {WrongInput, ExitGame} = {
-    println("Choose the side[X, O]:")
+  def chooseSide(): Cell / {WrongInput, ExitGame, PrintHelp} = {
+    val validOptions = [
+      ("X", "Cross"),
+      ("O", "Nought"),
+      ("h", "Read rules"),
+      ("q", "Exit game")
+    ]
+    val options: String = "[" ++ validOptions.map { e => e.first ++ " - " ++ e.second }
+                                          .join(", ") ++ "]"
+    println("Choose the side:\n" ++ options)
     val side = consoleInput()
     side match {
       case 'X' => Cross()
       case 'O' => Nought()
+      case 'h' => do PrintHelp(GameRules()); chooseSide()
       case 'q' => do ExitGame()
       case _ =>
-        do WrongInput("Invalid player type. Available options: [X, O, q]!")
+        do WrongInput("Invalid input!\n Available options: " ++ options ++ "\n")
         chooseSide()
     }
   }
@@ -61,23 +79,28 @@ def playGame(): Unit = {
    * Input : gameBoard: GameBoard
    * Output : Int [0 - 8]
    */
-  def chooseSmallBoard(gameBoard: GameBoard): Int / {WrongInput} = {
-    println("Choose the Small Board[1 - 9]:")
-    val smallBoardNumber: Char = consoleInput()
+  def chooseSmallBoard(gameBoard: GameBoard): Int / {WrongInput, PrintHelp, ExitGame} = {
+    println("Choose the Small Board:\n[h - help, q - exit]")
+    val input: Char = consoleInput()
 
-    if (isDigit(smallBoardNumber)) {
-      with on[WrongFormat].panic
-      val smallBoardNumber: Int = digitValue(smallBoardNumber).getOrElse{ 20 } - 1
-      if (checkAvailableCell(gameBoard.smallCopy, smallBoardNumber)){
-        smallBoardNumber
-      }else {
-        do WrongInput("This Small Board is Already occupied. Please type a number for a valid Small Board.")
+    input match { 
+      case 'q' => do ExitGame()
+      case 'h' => do PrintHelp(Board()); chooseSmallBoard(gameBoard)
+      case _ =>
+      if (isDigit(input)) {
+        with on[WrongFormat].panic
+        val smallBoardNumber: Int = digitValue(input).getOrElse{ 20 } - 1
+        if (checkAvailableCell(gameBoard.smallCopy, smallBoardNumber)){
+          smallBoardNumber
+        }else {
+          do WrongInput("This Small Board is Already occupied. Please type a number for a valid Small Board.")
+          chooseSmallBoard(gameBoard)
+        }
+      }
+      else {
+        do WrongInput("Invalid input. Please type a digit from 1 to 9.")
         chooseSmallBoard(gameBoard)
       }
-    }
-    else {
-      do WrongInput("Invalid input. Please type a digit from 1 to 9.")
-      chooseSmallBoard(gameBoard)
     }
   }
 
@@ -87,26 +110,32 @@ def playGame(): Unit = {
    * Input : gameBoard: GameBoard
    * Output : Int [0 - 8]
    */
-  def chooseCell(gameBoard: GameBoard, smallBoardNumber: Int): Int / {WrongInput} = {
+  def chooseCell(gameBoard: GameBoard, smallBoardNumber: Int): Int / {WrongInput, PrintHelp, ExitGame} = {
     with on[OutOfBounds].panic
 
-    println("Choose the cell inside the chosen Small Board")
-    val cellNumber: Char = consoleInput()
+    println("Choose the cell inside the chosen Small Board:\n[h - help, q - exit]")
+    val input: Char = consoleInput()
 
-    if (isDigit(cellNumber)) {
-      with on[WrongFormat].panic
-      val cellNumberInt: Int = digitValue(cellNumber).getOrElse {20} - 1
-      if(checkAvailableCell(gameBoard.bigBoard.get(smallBoardNumber), cellNumberInt)){
-        cellNumberInt
-      }else{
-        do WrongInput("This Cell is Already occupied. Please type a number for a valid cell.")
-        chooseCell(gameBoard, smallBoardNumber)
-      }
-    }else {
-      do WrongInput("Invalid input. Please type a number from 1 to 9.")
-      chooseCell(gameBoard, smallBoardNumber)
+    input match {
+      case 'q' => do ExitGame()
+      case 'h' => do PrintHelp(Board()); chooseCell(gameBoard, smallBoardNumber)
+      case _ =>
+        if (isDigit(input)) {
+          with on[WrongFormat].panic
+          val cellNumber: Int = digitValue(input).getOrElse {20} - 1
+          if(checkAvailableCell(gameBoard.bigBoard.get(smallBoardNumber), cellNumber)){
+            cellNumber
+        }else{
+          do WrongInput("This Cell is Already occupied. Please type a number for a valid cell.")
+          chooseCell(gameBoard, smallBoardNumber)
+        }
+        }else {
+          do WrongInput("Invalid input. Please type a number from 1 to 9.")
+          chooseCell(gameBoard, smallBoardNumber)
+        }
     }
-  }
+
+}
 
 
   /*
@@ -114,7 +143,7 @@ def playGame(): Unit = {
    * Input : player: Cell, gameMode: GameMode
    * Output : Unit
    */
-  def gameLoop(player: Cell, gameMode: GameMode): Unit / {WrongInput} = {
+  def gameLoop(player: Cell, gameMode: GameMode): Unit / {WrongInput, PrintHelp, ExitGame} = {
     var endGame: Bool = false
 
     var gameBoard: GameBoard = generateNewBigBoard()
@@ -215,8 +244,10 @@ def playGame(): Unit = {
       resume(())
     } with ExitGame {
       play = false
-    } with PrintRules {
-      printRules()
+    } with PrintHelp { rule => rule match {
+        case GameRules() => printRules()
+        case Board() => printBoard()
+      }
       resume(())
     }
   }
