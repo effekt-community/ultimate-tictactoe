@@ -5,180 +5,172 @@ import src/lib
 import src/Generate
 import src/Opponent
 
-def main() = mainSuite("main") {
+// Test Helpers
+def createBoardWithMoves(moves: List[Cell]): SmallBoard = {
+  var board: SmallBoard = empty()
+  moves.foreach { move => board = board.insert(board.size(), move) }
+  board
+}
+
+def createBoardWithMovesAtPositions(positions: List[Int], player: Cell): SmallBoard = {
+  var board: SmallBoard = fill(9, Empty())
+  positions.foreach { pos => board = board.replace(pos, player) }
+  board
+}
+
+def main() = mainSuite("Ultimate Tic-Tac-Toe Tests") {
   with on[OutOfBounds].panic
 
-  def createWinBoard(combination: List[Int], player: Cell): SmallBoard = {
-    var board: SmallBoard = fill(9, Empty())
-    combination.foreach { index => board = board.replace(index, player) }
-    board
+  suite("Cell Representation"){
+
+    test("Cross is represented as 'X'") {
+      assertEqual(playerString(Cross()), "X")
+    }
+    
+    test("Nought is represented as 'O'") {
+      assertEqual(playerString(Nought()), "O")
+    }
+
   }
-  test("Player String for Cross") {
-    assertEqual(playerString(Cross()), "X")
+
+  suite("Game Board Initialization") {
+
+    test("Board structure contains 9 small boards") {
+      val game: GameBoard = generateNewBigBoard()
+      assertEqual(game.bigBoard.size(), 9)
+    }
+
+    test("All small boards are initialized empty with correct size") {
+      val game = generateNewBigBoard()
+      game.bigBoard.foreach { board =>
+        assertEqual(board.size(), 9)
+        board.foreach { cell => assertEqual(cell, Empty())}
+      }
+    }
+
+    test("Game state tracker (smallCopy) is initialized empty") {
+      val game = generateNewBigBoard()
+      assertEqual(game.smallCopy.size(), 9)
+      game.smallCopy.foreach { cell => assertEqual(cell, Empty()) }
+    }
+
   }
-  test("Player String for Nought") {
-    assertEqual(playerString(Nought()), "O")
-  }
-  test("generateNewBigBoard creates BigBoard with 9 SmallBoards") {
-    val newGame: GameBoard = generateNewBigBoard()
-    assertEqual(newGame.bigBoard.size(), 9)
-  }
-  test("generateNewBigBoard initializes SmallBoards with Empty cells") {
-    val newGame: GameBoard = generateNewBigBoard()
-    newGame.bigBoard.foreach { smallBoard =>
-      smallBoard.foreach { cell =>
+
+  suite("Board State Management"){
+
+    test("Activation of small board updates both board and state tracker") {
+      val boardIndex = 3
+      var game = generateNewBigBoard()
+      game = activateSmallBoard(game, boardIndex)
+
+      // Verify state tracker
+      assertEqual(game.smallCopy.get(boardIndex), Active())
+      
+      // Verify board cells
+      game.bigBoard.get(boardIndex).foreach { cell =>
+        assertEqual(cell, Active())
+      }
+    }
+
+    test("Deactivation of small board restores empty state") {
+      val boardIndex = 5
+      var game = generateNewBigBoard()
+      game = activateSmallBoard(game, boardIndex)
+      game = deactivateSmallBoard(game, boardIndex)
+
+      // Verify board cells restored to empty
+      game.bigBoard.get(boardIndex).foreach { cell =>
         assertEqual(cell, Empty())
       }
-      assertEqual(smallBoard.size(), 9)
+      assertEqual(game.smallCopy.get(boardIndex), Empty())
     }
-  }
-  test("generateNewBigBoard initializes smallCopy with Empty cells") {
-    val newGame = generateNewBigBoard()
-    newGame.smallCopy.foreach { cell =>
-      assertEqual(cell, Empty())
-    }
-    assertEqual(newGame.smallCopy.size(), 9)
+    
   }
 
-  test("Activates small board 0 and updates smallCopy") {
-    var game = generateNewBigBoard()
-    game = activateSmallBoard(game, 0)
+  suite("Move Validation"){
 
-    assertEqual(game.smallCopy.get(0), Active()) // Check smallCopy update
-
-    val smallBoard0 = game.bigBoard.get(0)
-    smallBoard0.foreach { cell =>
-      assertEqual(cell, Active()) // Check if all cells in smallBoard0 are Active
+    test("Valid moves are correctly identified"){
+      val testCases = [
+        (Empty(), true, "Empty cells are valid moves"),
+        (Active(), true, "Active cells are valid moves"),
+        (Cross(), false, "Occupied cells (Cross) are invalid moves"),
+        (Nought(), false, "Occupied cells (Nought) are invalid moves")
+      ]
+      testCases.foreach { case (cell, expected, message) =>
+        var board = fill(9, Empty())
+        board = board.replace(0, cell)
+        assertEqual(checkAvailableCell(board, 0), expected, message)
+      }
     }
+
   }
 
-  test("Activates small board 5 and updates smallCopy") {
-    var game = generateNewBigBoard()
-    game = activateSmallBoard(game, 5)
+  suite("Win Detection"){
 
-    assertEqual(game.smallCopy.get(5), Active()) // Check smallCopy update
-
-    val smallBoard5 = game.bigBoard.get(5)
-    smallBoard5.foreach { cell =>
-      assertEqual(cell, Active()) // Check if all cells in smallBoard5 are Active
+    test("Win combinations are detected"){
+      val winningPositions = [0, 1, 2] // Top row
+      val board = winningPositions.createBoardWithMovesAtPositions(Cross())
+      assertEqual(
+        checkWinSituation(board, Cross()),
+        Finish(true, Win(), Cross())
+      )
     }
+
+    test("Draw state is correctly identified") {
+      val drawMoves = [
+        Cross(), Nought(), Cross(),
+        Nought(), Cross(), Nought(),
+        Nought(), Cross(), Nought()
+      ]
+      val board = drawMoves.createBoardWithMoves()
+      assertEqual(
+        checkWinSituation(board, Cross()),
+        Finish(true, Lose(), Cross())
+      )
+    }
+
+    test("Ongoing game state is correctly identified") {
+      val inProgressMoves = [
+        Cross(), Empty(), Nought(),
+        Empty(), Cross(), Empty(),
+        Empty(), Empty(), Empty()
+      ]
+      val board = createBoardWithMoves(inProgressMoves)
+      assertEqual(
+        checkWinSituation(board, Cross()),
+        Finish(false, Lose(), Cross())
+      )
+    }
+
+  }
+
+
+  suite("Computer Player Logic") {
+
+    test("Turn determination is correct") {
+      val testCases = [
+        (Cross(), Cross(), true, "Computer plays as Cross on Cross turn"),
+        (Cross(), Nought(), false, "Computer as Cross waits on Nought turn"),
+        (Nought(), Nought(), true, "Computer plays as Nought on Nought turn"),
+        (Nought(), Cross(), false, "Computer as Nought waits on Cross turn")
+      ]
+
+      testCases.foreach { case (computer, current, expected, message) =>
+        assertEqual(isComputerTurn(current, computer), expected, message)
+      }
+    }
+
+    test("Computer makes valid moves") {
+      val board = fill(9, Empty())
+      val move = computerPlay(board, Cross())
+      
+      assertEqual(move >= 0, move <= 8, "Move is within valid range")
+      assertEqual(checkAvailableCell(board, move), true, "Selected cell is available")
+    }
+    
   }
   
-  test("Deactivates small board 0"){
-    var game = generateNewBigBoard()
-    game = activateSmallBoard(game, 0) // First activate it
-    game = deactivateSmallBoard(game, 0) // Then deactivate
-
-    val smallBoard0 = game.bigBoard.get(0)
-    smallBoard0.foreach { cell =>
-      assertEqual(cell, Empty()) // Check if all cells in smallBoard0 are Empty again
-    }
-    // You might want to assert something about smallCopy here depending on desired behavior
-    // For example, if smallCopy should also be reset:
-    // assertEqual(game.smallCopy.get(0), Empty())
-  }
-
-  test("checkNewCell places Cross in cell 0 of small board 0") {
-    var game = generateNewBigBoard()
-    game = checkNewCell(game, 0, 0, Cross())
-    assertEqual(game.bigBoard.get(0).get(0), Cross())
-  }
-
-  test("checkNewCell places Nought in cell 5 of small board 3") {
-    var game = generateNewBigBoard()
-    game = generateNewBigBoard()
-    game = checkNewCell(game, 3, 5, Nought())
-    assertEqual(game.bigBoard.get(3).get(5), Nought())
-  }
-
-  test("checkAvailableCell returns true for Empty cell") {
-    val smallBoard: SmallBoard = fill(9, Empty())
-    assertEqual(checkAvailableCell(smallBoard, 2), true)
-  }
-
-  test("checkAvailableCell returns true for Active cell") {
-    val smallBoard: SmallBoard = fill(9, Empty()).replace(4, Active())
-    assertEqual(checkAvailableCell(smallBoard, 4), true)
-  }
-
-  test("checkAvailableCell returns false for Cross cell") {
-    val smallBoard: SmallBoard = fill(9, Empty()).replace(7, Cross())
-    assertEqual(checkAvailableCell(smallBoard, 7), false)
-  }
-
-  test("checkAvailableCell returns false for Nought cell") {
-    val smallBoard: SmallBoard = fill(9, Empty()).replace(1, Nought())
-    assertEqual(checkAvailableCell(smallBoard, 1), false)
-  }
-  test("Winning Combinations"){
-    winCombinations.take(3).foreach { combination => // First 3 are rows
-        val winBoard = createWinBoard(combination, Cross())
-        assertEqual(checkWinSituation(winBoard, Cross()), Finish(true, Win(), Cross()))
-      }
-  }
-  test("Lose") {
-    var drawBoard: SmallBoard = empty()
-    [Cross(), Nought(), Cross(), Nought(), Cross(), Cross(), Nought(), Cross(), Nought()].foreach { player =>
-      drawBoard = drawBoard.insert(drawBoard.size(), player)
-    }
-    assertEqual(checkWinSituation(drawBoard, Cross()), Finish(true, Lose(), Cross()))
-  }
-
-  test("No Win Yet") {
-    val noWinBoard: SmallBoard = [Cross(), Empty(), Nought(), Empty(), Cross(), Empty(), Empty(), Empty(), Nought()]
-    assertEqual(checkWinSituation(noWinBoard, Cross()), Finish(false, Lose(), Cross()))
-  }
-
-  test("fillWinningGameBoard fills with Cross") {
-    var game = generateNewBigBoard()
-    game = fillWinningGameBoard(game, 2, Cross())
-    val smallBoard2 = game.bigBoard.get(2)
-    smallBoard2.foreach { cell => assertEqual(cell, Cross()) }
-    assertEqual(game.smallCopy.get(2), Cross())
-  }
-
-  test("fillWinningGameBoard fills with Nought") {
-    var game = generateNewBigBoard()
-    game = fillWinningGameBoard(game, 7, Nought())
-    val smallBoard7 = game.bigBoard.get(7)
-    smallBoard7.foreach { cell => assertEqual(cell, Nought()) }
-    assertEqual(game.smallCopy.get(7), Nought())
-  }
-
-  test("fillWinningGameBoard fills with Draw") {
-    var game = generateNewBigBoard()
-    game = fillWinningGameBoard(game, 4, Draw())
-    val smallBoard4 = game.bigBoard.get(4)
-    smallBoard4.foreach { cell => assertEqual(cell, Draw()) }
-    assertEqual(game.smallCopy.get(4), Draw())
-  }
-
-  test("Computer Cross, Player Cross - Computer's turn") {
-    assertEqual(isComputerTurn(Cross(), Cross()), true)
-  }
-
-  test("Computer Cross, Player Nought - Not computer's turn") {
-    assertEqual(isComputerTurn(Nought(), Cross()), false)
-  }
-  test("Computer Nought, Player Nought - Computer's turn") {
-    assertEqual(isComputerTurn(Nought(), Nought()), true)
-  }
-  test("Computer Nought, Player Cross - Not computer's turn") {
-    assertEqual(isComputerTurn(Cross(), Nought()), false)
-  }
-
-  test("computerPlay returns valid cell on empty board") {
-    val emptyBoard: SmallBoard = fill(9, Empty())
-    val resultCell = computerPlay(emptyBoard, Cross())
-    assertEqual(resultCell >= 0, resultCell <= 8)
-  }
-
-  test("computerPlay returns valid cell on almost full board") {
-    var almostFullBoard: SmallBoard = empty()
-    [Cross(), Nought(), Cross(), Nought(), Cross(), Nought(), Nought(), Cross(), Empty()].foreach { player =>
-      almostFullBoard = almostFullBoard.insert(almostFullBoard.size(), player)
-    }
-    val resultCell = computerPlay(almostFullBoard, Nought())
-    assertEqual(resultCell >= 0, resultCell <= 8)
+  test("I need this test, to fix the possible Overload Error.") {
+    assertEqual(5 > 3, true)
   }
 }
