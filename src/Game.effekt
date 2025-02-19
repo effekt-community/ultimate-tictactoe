@@ -67,7 +67,7 @@ def playGame(): Unit = {
 
     if (isDigit(smallBoardNumber)) {
       with on[WrongFormat].panic
-      val smallBoardNumber: Int = parseDigit(smallBoardNumber) - 1
+      val smallBoardNumber: Int = digitValue(smallBoardNumber).getOrElse{ 20 } - 1
       if (checkAvailableCell(gameBoard.smallCopy, smallBoardNumber)){
         smallBoardNumber
       }else {
@@ -95,7 +95,7 @@ def playGame(): Unit = {
 
     if (isDigit(cellNumber)) {
       with on[WrongFormat].panic
-      val cellNumberInt: Int = parseDigit(cellNumber) - 1
+      val cellNumberInt: Int = digitValue(cellNumber).getOrElse {20} - 1
       if(checkAvailableCell(gameBoard.bigBoard.get(smallBoardNumber), cellNumberInt)){
         cellNumberInt
       }else{

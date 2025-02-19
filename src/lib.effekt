@@ -43,11 +43,6 @@ val winCombinations: List[List[Int]] = [[0,1,2], [3,4,5], [6,7,8],[0,3,6],[1,4,7
 def playerString(player: Cell): String = {
   if (player is Cross()) "X"
   else "O"
-  // player match {
-  //   case Cross() => "X"
-  //   case Nought() => "O"
-  //   case _ => ""
-  // }
 }
 
 
@@ -69,21 +64,30 @@ def consoleInput(): Char = {
 
 
 /*
- * Converts char to Digit
- * Input : c: Char
- * Output : Int
- */
-def parseDigit(c: Char): Int = {
-  digitValue(c) match {
-    case Some(value) => value
-    case None() => 0
-  }
-}
-
-
-/*
  * Prints new line to the console
  * Input : None
  * Output : Int
  */
 def newLine(): Unit = println("\n")
+
+/// Find the first element that satisfies the given predicate
+/// Returns None() if no element is found
+///
+/// Examples:
+/// ```
+/// > [1, 2, 3, 4, 5].find { x => x > 3 }
+/// Some(4)
+///
+/// > [1, 2, 3].find { x => x > 10 }
+/// None()
+/// ```
+///
+/// O(N)
+def find[A](list: List[A]) { predicate: A => Bool }: Option[A] = {
+  list match {
+    case Nil() => None()
+    case Cons(head, tail) =>
+      if (predicate(head)) Some(head)
+      else tail.find { predicate }
+  }
+}
