@@ -1,7 +1,7 @@
-module src/opponent1
+module src/opponent
 
 import src/lib
-import src/generate1
+import src/generate
 
 def winScore(): Int = 1000
 def loseScore(): Int = -1000

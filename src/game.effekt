@@ -5,9 +5,9 @@ import char
 import io/console
 import stream
 import src/lib
-import src/render1
-import src/generate1
-import src/opponent1
+import src/render
+import src/generate
+import src/opponent
 
 
 /*
