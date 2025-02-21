@@ -1,13 +1,13 @@
-module src/Game
+module src/game
 
 import tty
 import char
 import io/console
 import stream
 import src/lib
-import src/Render
-import src/Generate
-import src/Opponent
+import src/render
+import src/generate
+import src/opponent
 
 
 /*
@@ -63,8 +63,8 @@ def playGame(): Unit = {
                                             .join(", ") ++ "]"
 
     println("Choose the Difficulty:\n" ++ options)
-    val side = consoleInput()
-    side match {
+    val difficulty = consoleInput()
+    difficulty match {
       case '1' => 0
       case '2' => 1
       case '3' => 2
@@ -81,7 +81,7 @@ def playGame(): Unit = {
    * Input : None
    * Output : Cell
    */
-  def chooseSide(): Cell / {WrongInput, ExitGame, PrintHelp} = {
+  def chooseSide(): Cell / { WrongInput, ExitGame, PrintHelp } = {
     val validOptions = [
       ("X", "Cross"),
       ("O", "Nought"),

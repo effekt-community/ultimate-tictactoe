@@ -1,4 +1,4 @@
-module src/Render
+module src/render
 
 import src/lib
 import tty

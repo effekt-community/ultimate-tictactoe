@@ -3,9 +3,8 @@ module src/Opponent
 import src/lib
 import src/Generate
 
-def WIN_SCORE(): Int = 1000
-def LOSE_SCORE(): Int = -1000
-def DRAW_SCORE(): Int = 0
+def winScore(): Int = 1000
+def loseScore(): Int = -1000
 
 
 /*
@@ -22,7 +21,7 @@ def advancedComputerPlay(gameBoard: GameBoard, smallBoardNumber: Int, computer: 
     computerPlay(currentBoard, computer)
   } else {
     var bestMove = -1
-    var bestScore = LOSE_SCORE()
+    var bestScore = loseScore()
     val maxDepth = if (difficulty == 1) 3 else 5 // Medium uses depth 3, Hard uses depth 5
 
     // try each possible move
@@ -76,7 +75,7 @@ def minimax(gameBoard: GameBoard, nextBoard: Int, depth: Int, isMaximizing: Bool
 
   if (retValue == -1) {
     if (isMaximizing) {
-      var maxScore = LOSE_SCORE()
+      var maxScore = loseScore()
       build(9){ i => i}.foreach { move => 
         if (checkAvailableCell(currentBoard, move)) {
           var newGame = gameBoard
@@ -87,7 +86,7 @@ def minimax(gameBoard: GameBoard, nextBoard: Int, depth: Int, isMaximizing: Bool
       }
       retValue = maxScore
     } else {
-      var minScore = WIN_SCORE()
+      var minScore = winScore()
       build(9){ i => i}.foreach { move => 
         if (checkAvailableCell(currentBoard, move)) {
           var newGame = gameBoard
@@ -130,9 +129,9 @@ def evaluateGameState(state: Finish, computer: Cell): Int = {
   if (state.isFinished) {
     state.state match {
       case Win() => 
-        if (state.player is computer) WIN_SCORE()
-        else LOSE_SCORE()
-      case _ => DRAW_SCORE()
+        if (state.player is computer) winScore()
+        else loseScore()
+      case _ => 0
     }
   } else {
     0

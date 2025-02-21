@@ -2,8 +2,8 @@ module src/test
 
 import test
 import src/lib
-import src/Generate
-import src/Opponent
+import src/generate
+import src/opponent
 
 // Test Helpers
 def createBoardWithMoves(moves: List[Cell]): SmallBoard = {

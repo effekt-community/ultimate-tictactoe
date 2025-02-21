@@ -1,4 +1,4 @@
-module src/Generate
+module src/generate
 
 import tty
 import io/console
