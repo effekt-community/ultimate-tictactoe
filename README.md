@@ -1,6 +1,6 @@
 # Ultimate Tic-Tac-Toe Game
 
-An advanced version of the classic Tic-Tac-Toe game with a twist. The game consists of a 3x3 grid of Tic-Tac-Toe boards, where each move determines the board on which the opponent must play next.
+An advanced version of the classic Tic-Tac-Toe game with a twist. The game consists of a 3x3 grid of Tic-Tac-Toe boards, where each move determines the board on which the opponent must play next. This implementation features an advanced AI opponent and a polished terminal interface.
 
 ## Must-have
 
@@ -13,7 +13,10 @@ An advanced version of the classic Tic-Tac-Toe game with a twist. The game consi
 
 ## Can-have
 
-- [x] Computer opponent logic with different difficulty levels.
+- [x] Computer opponent logic with different difficulty levels:
+  - Easy: Basic strategy
+  - Medium: 3-move lookahead
+  - Hard: 5-move lookahead with advanced evaluation
 - [ ] Customizable themes and board designs.
 - [ ] Replay functionality to review past games.
 
@@ -30,22 +33,67 @@ An advanced version of the classic Tic-Tac-Toe game with a twist. The game consi
 
 ## FFI and libraries
 
-- Terminal output library for rendering the game interface.
-- Current status: Researching suitable libraries and evaluating their integration complexity.
-- Official List library
-- Official String library.
-- Official Console library.
+- Terminal output library for rendering the game interface with ANSI colors
+- Current implementation uses:
+  - Official List library for board representation
+  - Official String library for text processing
+  - Official Console library for user input
+  - TTY library for terminal manipulation
+
+## Project Structure
+
+```
+src/
+├── main.effekt    # Entry point and game initialization
+├── game.effekt    # Core game logic and flow control
+├── lib.effekt     # Common utilities, types, and effects
+├── opponent.effekt # AI implementation with minimax algorithm
+├── render.effekt  # Terminal UI rendering
+├── generate.effekt # Board generation and management
+└── test.effekt    # Comprehensive test suite
+```
 
 ## Running The Project
 
 To run the project, you need to have Effekt installed on your machine. You can find instructions on how to install Effekt [here](https://effekt-lang.org/docs)
 
-After installing Effekt, you can run the project by executing the following command in the project's root directory:
-
+### For Development
 ```bash
 effekt src/main.effekt --backend js --includes .
 ```
 
+### Running Tests
+```bash
+effekt src/test.effekt --backend js --includes .
+```
+
+## Game Controls
+
+- Numbers 1-9: Select board/cell position
+- 'h': Display help and game rules
+- 'b': Show board position guide
+- 'q': Quit game
+
+## Features
+
+### AI Implementation
+- Minimax algorithm with alpha-beta pruning
+- Position evaluation heuristics
+- Three difficulty levels
+- Strategic decision making prioritizing:
+  1. Winning moves
+  2. Blocking opponent wins
+  3. Strategic side moves
+
+### User Interface
+- Color-coded game elements
+- Clear game state visualization
+- Interactive help system
+- Board position guide
+- Game mode selection menu
+
 ## Resources
 
-- [Ultimate Tic-Tac-Toe reference](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
+- [Ultimate Tic-Tac-Toe reference](https://en.wikipedia.org/wiki/Ultimate-tic-tac-toe)
+- [Effekt Documentation](https://effekt-lang.org/docs)
+- [Project Repository](https://github.com/dzianis-sudkou/effekt_ultimate_tictac)
