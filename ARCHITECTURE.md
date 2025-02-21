@@ -2,97 +2,139 @@
 
 ## Project Overview
 
-This project implements Ultimate Tic-Tac-Toe in the Effekt programming language. The game is a complex variant of traditional Tic-Tac-Toe played on a 3x3 grid of smaller Tic-Tac-Toe boards.
+This project implements Ultimate Tic-Tac-Toe in the Effekt programming language. The game is a complex variant of traditional Tic-Tac-Toe played on a 3x3 grid of smaller Tic-Tac-Toe boards, featuring both local multiplayer and AI opponent modes.
 
 ## Core Components
 
 ### 1. Game Core (`src/lib.effekt`)
 - Defines fundamental data types and structures
-- Contains core type definitions:
-  - `Cell`: Represents board cell states (Empty, Active, Nought, Cross, etc.)
-  - `GameBoard`: Main game state container
-  - `SmallBoard`: Individual 3x3 board
+- Core type definitions:
+  - `Cell`: Board cell states (Empty, Active, Nought, Cross, Draw)
+  - `GameMode`: Game mode types (Local, Computer)
+  - `GameBoard`: Composite type containing BigBoard and SmallCopy
+  - `SmallBoard`: Single 3x3 board representation
   - `BigBoard`: Collection of nine SmallBoards
-- Implements utility functions and shared constants
+  - `Finish`: Game state tracking (isFinished, state, player)
+- Effect definitions:
+  - `WrongInput`
+  - `ExitGame`
+  - `PrintHelp`
+- Utility functions and constants
 
-### 2. Game Logic (`src/Game.effekt`)
-- Contains the main game loop and control flow
-- Handles:
-  - Game mode selection (Local/Computer)
-  - Player turn management
-  - Game state transitions
-  - User input processing
-  - Win condition verification
-
-### 3. Board Generation (`src/Generate.effekt`)
-- Manages board state creation and modifications
+### 2. Game Logic (`src/game.effekt`)
+- Implements main game loop and control flow
 - Key functionalities:
+  - Game mode selection (Local/Computer)
+  - Difficulty level selection (Easy/Medium/Hard)
+  - Player side selection (X/O)
+  - Turn management
+  - Input validation
+  - Game state transitions
+  - Win condition verification
+  - User interaction handling
+
+### 3. Board Generation (`src/generate.effekt`)
+- Manages board state creation and modifications
+- Core functionalities:
   - Initial board generation
   - Board state updates
+  - Cell activation/deactivation
   - Win condition checking
-  - Computer move generation
-  - Cell availability verification
+  - Board state validation
+  - Victory pattern detection
 
-### 4. Rendering System (`src/Render.effekt`)
-- Handles all visual output
+### 4. AI Opponent System (`src/opponent.effekt`)
+- Implements computer player logic
 - Features:
+  - Multiple difficulty levels
+  - Minimax algorithm implementation
+  - Position evaluation
+  - Strategic move selection
+  - Win/block detection
+- Optimization strategies:
+  - Position scoring
+  - Depth-limited search
+  - Move prioritization
+
+### 5. Rendering System (`src/render.effekt`)
+- Handles all visual output
+- Components:
   - Board visualization
   - Game state display
-  - Welcome and exit screens
+  - Welcome screen
+  - Exit screen
   - Rules display
-  - Console-based UI components
+  - Color-coded UI elements
+  - Console-based interface
 
-### 5. Entry Point (`src/main.effekt`)
+### 6. Entry Point (`src/main.effekt`)
 - Application entry point
-- Initializes game components
+- Game initialization
 
 ## Data Flow
 
-1. Game initialization starts from `main.effekt`
-2. `Game.effekt` controls the game loop:
-   - Player input → State validation → Board update → Render update
-3. `Generate.effekt` handles state transformations
-4. `Render.effekt` provides visual feedback
-5. `lib.effekt` provides shared utilities and type definitions
+1. Game initialization from `main.effekt`
+2. Game mode and settings selection
+3. Main game loop (`game.effekt`):
+   - Input processing
+   - State validation
+   - Board updates
+   - AI moves (if applicable)
+   - Visual feedback
+4. State management through `generate.effekt`
+5. AI processing via `opponent.effekt`
+6. Visual output through `render.effekt`
 
-## Key Design Patterns
+## Effect System Usage
 
-### Effect System
-- Uses Effekt's effect system for error handling
-- Defined effects:
-  - `WrongInput`
-  - `ExitGame`
-  - `PrintRules`
+### Core Effects
+- `WrongInput`: Input validation errors
+- `ExitGame`: Game termination
+- `PrintHelp`: Help system access
+- `OutOfBounds`: Array bounds checking
 
-### State Management
-- Immutable data structures
-- Pure functions for state transformations
-- Clear separation of rendering and game logic
-
-### Board Representation
-- Nested list structure for the game board
-- Efficient state tracking with SmallBoard copies
-- Type-safe cell state representation
+### Effect Handlers
+- Input validation
+- Error recovery
+- Game state management
+- Visual feedback
 
 ## Testing
 
-Test suite (`src/test.effekt`) includes comprehensive tests for:
-- Board generation
-- Game mechanics
-- Win condition verification
-- Computer player logic
-- Cell availability checking
-
-## Future Improvements
-
-1. Network multiplayer support
-2. Advanced AI strategies
-3. Save/Load game state
-4. Graphical user interface
-5. Game statistics tracking
+Comprehensive test suite (`src/test.effekt`) covering:
+- Cell representation
+- Board initialization
+- State management
+- Move validation
+- Win detection
+- AI logic
+- Difficulty levels
+- Edge cases
 
 ## Technical Requirements
 
 - Effekt programming language
-- Console-based display
+- Console-based interface
+- ANSI color support
 - Standard input/output handling
+
+## Future Enhancements
+
+1. Enhanced AI strategies
+2. Network multiplayer
+3. Game state persistence
+4. Statistics tracking
+5. Advanced difficulty levels
+6. Replay system
+7. Tutorial mode
+8. Configuration options
+
+## Development Guidelines
+
+1. Type safety first
+2. Effect system for error handling
+3. Pure functions where possible
+4. Clear separation of concerns
+5. Comprehensive testing
+6. Modular design
+7. Documentation maintenance
