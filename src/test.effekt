@@ -169,7 +169,53 @@ def main() = mainSuite("Ultimate Tic-Tac-Toe Tests") {
     }
     
   }
+
+  suite("Advanced AI Logic") {
+    test("Different difficulty levels produce valid moves") {
+      val game = generateNewBigBoard()
+      val difficulties = [0, 1, 2] // Easy, Medium, Hard
+
+      difficulties.foreach { difficulty => 
+        val move = advancedComputerPlay(game, 4, Cross(), difficulty)
+        println("Difficulty: " ++ show(difficulty) ++ " Move: " ++ show(move))
+        assertEqual(move >= 0, move <= 8, "Move should be in a valid range")
+        assertEqual(checkAvailableCell(game.bigBoard.get(4), move), true, "Move should be available")
+      }
+    }
+  }
+
+  test("AI blocks winning moves") {
+    // Create a board where opponent is about to win
+    val opponentWinningBoard = createBoardWithMoves([
+      Cross(), Cross(), Empty(), // Opponent can win with position 2
+      Empty(), Nought(), Empty(),
+      Empty(), Empty(), Empty()
+    ])
+    var game = generateNewBigBoard()
+
+    val newBigBoard = game.bigBoard.replace(4, opponentWinningBoard)
+    game = GameBoard(newBigBoard, game.smallCopy)
+
+    val move = advancedComputerPlay(game, 4, Nought(), 2) // Hard difficulty
+    assertEqual(move, 2, "AI should block opponent's winning move")
+  }
   
+
+  test("AI takes winning moves when available") {
+    // Create a board where AI can win
+    val winningBoard = createBoardWithMoves([
+      Cross(), Cross(), Empty(), // AI can win with position 2
+      Empty(), Empty(), Empty(),
+      Empty(), Empty(), Empty()
+    ])
+    var game = generateNewBigBoard()
+
+    val newBigBoard = game.bigBoard.replace(3, winningBoard)
+    game = GameBoard(newBigBoard, game.smallCopy)
+
+    val move = advancedComputerPlay(game, 3, Cross(), 2) // Hard difficulty
+    assertEqual(move, 2, "AI should take a winning move")
+  }
   test("I need this test, to fix the possible Overload Error.") {
     assertEqual(5 > 3, true)
   }

@@ -47,6 +47,36 @@ def playGame(): Unit = {
 
 
   /*
+   * Returns the chosen difficulty
+   * Input : None
+   * Output : Int
+   */
+  def chooseDifficulty(): Int / {WrongInput, ExitGame, PrintHelp} = {
+    val validOptions = [
+      ("1", "Easy"),
+      ("2", "Medium"),
+      ("3", "Hard"),
+      ("h", "Read rules"),
+      ("q", "Exit game")
+    ]
+    val options: String = "[" ++ validOptions.map { e => e.first ++ " - " ++ e.second }
+                                            .join(", ") ++ "]"
+
+    println("Choose the Difficulty:\n" ++ options)
+    val side = consoleInput()
+    side match {
+      case '1' => 0
+      case '2' => 1
+      case '3' => 2
+      case 'h' => do PrintHelp(GameRules()); chooseDifficulty()
+      case 'q' => do ExitGame()
+      case _ =>
+        do WrongInput("Invalid Input!\nAvailable options: " ++ options ++ "\n")
+        chooseDifficulty()
+    }
+  }
+
+  /*
    * Returns the Cell Type of the player
    * Input : None
    * Output : Cell
@@ -142,7 +172,7 @@ def playGame(): Unit = {
    * Input : player: Cell, gameMode: GameMode
    * Output : Unit
    */
-  def gameLoop(player: Cell, gameMode: GameMode): Unit / {WrongInput, PrintHelp, ExitGame} = {
+  def gameLoop(player: Cell, gameMode: GameMode, difficulty: Int): Unit / {WrongInput, PrintHelp, ExitGame} = {
     var endGame: Bool = false
 
     var gameBoard: GameBoard = generateNewBigBoard()
@@ -173,7 +203,7 @@ def playGame(): Unit = {
       // The Move Phase
       printGameScreen(gameBoard, currentPlayer)
       if (gameMode is Computer()) {
-        if (isComputerTurn(currentPlayer, computer)) currentCell = computerPlay(gameBoard.bigBoard.get(currentSmallBoard), computer)
+        if (isComputerTurn(currentPlayer, computer)) currentCell = advancedComputerPlay(gameBoard, currentSmallBoard, computer, difficulty)
         else currentCell = chooseCell(gameBoard, currentSmallBoard)
       }else currentCell = chooseCell(gameBoard, currentSmallBoard)
 
@@ -239,7 +269,11 @@ def playGame(): Unit = {
   while (play) {
     try{
       // Starting the game
-      gameLoop(chooseSide(), chooseGameMode())
+      val gm = chooseGameMode()
+      gm match {
+        case Local() => gameLoop(chooseSide(), gm, 0)
+        case Computer() => gameLoop(chooseSide(), gm, chooseDifficulty())
+      }
     } with WrongInput { msg =>
       println(msg)
       resume(())
