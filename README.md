@@ -1,3 +1,9 @@
+> [!NOTE]
+> This is a community-maintained fork of a MIT-licensed student project in the *Effective Programming with Effects* course in winter semester 2024/2025.
+> Be warned that this is not an officially endorsed project, the code in this repository may be not idiomatic Effekt.
+> 
+> The original repository is https://github.com/dzianis-sudkou/effekt_ultimate_tictac
+
 # Ultimate Tic-Tac-Toe Game
 
 An advanced version of the classic Tic-Tac-Toe game with a twist. The game consists of a 3x3 grid of Tic-Tac-Toe boards, where each move determines the board on which the opponent must play next. This implementation features an advanced AI opponent and a polished terminal interface.
