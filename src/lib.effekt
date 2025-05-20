@@ -65,14 +65,33 @@ def playerString(player: Cell): String = {
 def consoleInput(): Char = {
   with on[OutOfBounds].panic
   with console
+
   val input = do readLine()
   if (input.length() == 1) {
     charAt(input, 0)
-  }else{
+  } else {
     ' '
   }
 }
 
+  /*
+   * Ask the player to choose a square from 1-9 incl.
+   */
+  def chooseSquare(): Int / {WrongInput, ExitGame, PrintHelp} =
+    consoleInput() match {
+      case 'q' => do ExitGame()
+      case 'h' => do PrintHelp(Board()); chooseSquare()
+      case '0' =>
+        do WrongInput("Invalid input. Please type a number from 1 to 9.")
+        chooseSquare()
+      case c =>
+        with on[WrongFormat].default {
+          do WrongInput("Invalid input. Please type a number from 1 to 9.")
+          chooseSquare()
+        }
+
+        c.digitValue - 1
+    }
 
 /*
  * Prints new line to the console
