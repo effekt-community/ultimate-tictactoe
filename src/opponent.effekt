@@ -25,7 +25,7 @@ def advancedComputerPlay(gameBoard: GameBoard, smallBoardNumber: Int, computer: 
     val maxDepth = if (difficulty == 1) 3 else 5 // Medium uses depth 3, Hard uses depth 5
 
     // try each possible move
-    build(9){ i => i }.foreach { move =>
+    each(0, 9) { move =>
       if (checkAvailableCell(currentBoard, move)) {
         var simulatedGame = gameBoard
         simulatedGame = checkNewCell(simulatedGame, smallBoardNumber, move, computer)
@@ -76,7 +76,7 @@ def minimax(gameBoard: GameBoard, nextBoard: Int, depth: Int, isMaximizing: Bool
   if (retValue == -1) {
     if (isMaximizing) {
       var maxScore = loseScore()
-      build(9){ i => i}.foreach { move => 
+      each(0, 9) { move =>
         if (checkAvailableCell(currentBoard, move)) {
           var newGame = gameBoard
           newGame = checkNewCell(newGame, nextBoard, move, computer)
@@ -87,7 +87,7 @@ def minimax(gameBoard: GameBoard, nextBoard: Int, depth: Int, isMaximizing: Bool
       retValue = maxScore
     } else {
       var minScore = winScore()
-      build(9){ i => i}.foreach { move => 
+      each(0, 9) { move =>
         if (checkAvailableCell(currentBoard, move)) {
           var newGame = gameBoard
           newGame = checkNewCell(newGame, nextBoard, move, opponent)
@@ -109,7 +109,7 @@ def evaluatePosition(gameBoard: GameBoard, computer: Cell): Int = {
   with on[OutOfBounds].panic
   var score = 0
   // Score small boards
-  build(9){ i => i }.foreach { sm =>
+  each(0, 9) { sm =>
     val currentSmallBoard = gameBoard.bigBoard.get(sm)
     val boardState = checkWinSituation(currentSmallBoard, computer)
     score = score + evaluateGameState(boardState, computer) / 10
