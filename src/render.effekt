@@ -13,7 +13,7 @@ import stream
  */
 def renderBoard(board: BigBoard): Unit = {
   renderSeparator()
-  [0,3,6].foreach {c => println(createUnifiedRow(board.slice(c,c+3))); renderSeparator()}
+  [0,3,6].foreach {c => println(createUnifiedRow(board.slice(c, c + 3))); renderSeparator()}
 }
 
 
