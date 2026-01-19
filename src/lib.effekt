@@ -85,12 +85,12 @@ def consoleInput(): Char = {
         do WrongInput("Invalid input. Please type a number from 1 to 9.")
         chooseSquare()
       case c =>
-        with on[WrongFormat].default {
+        attempt {
+          c.digitValue - 1
+        } {
           do WrongInput("Invalid input. Please type a number from 1 to 9.")
           chooseSquare()
         }
-
-        c.digitValue - 1
     }
 
 /*
